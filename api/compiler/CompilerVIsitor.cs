@@ -234,4 +234,45 @@ public class CompilerVisitor : LanguageBaseVisitor<ValueWrapper>
         }
         return defaultValue;
     }
+    //VisitFor
+    public override ValueWrapper VisitForStmt(LanguageParser.ForStmtContext context)
+    {
+        Visit(context.expr(0));
+        ValueWrapper condition = Visit(context.expr(1));
+        if(condition is not BoolValue)
+        {
+            throw new Exception("Invalid condition");
+        }
+        while(((BoolValue)condition).Value)
+        {
+            Visit(context.stmt());
+            Visit(context.expr(2));
+            condition = Visit(context.expr(1));
+            if(condition is not BoolValue)
+            {
+                throw new Exception("Invalid condition");
+            }
+        }
+        return defaultValue;
+    }
+    //VisitDoWhileStmt
+    public override ValueWrapper VisitDoWhileStmt(LanguageParser.DoWhileStmtContext context)
+    {
+        ValueWrapper condition = Visit(context.expr());
+        if(condition is not BoolValue)
+        {
+            throw new Exception("Invalid condition");
+        }
+        do
+        {
+            Visit(context.stmt());
+            condition = Visit(context.expr());
+            if(condition is not BoolValue)
+            {
+                throw new Exception("Invalid condition");
+            }
+        } while(((BoolValue)condition).Value);
+        return defaultValue;
+    }
+
 }
