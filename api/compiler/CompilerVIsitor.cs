@@ -5,7 +5,12 @@ public class CompilerVisitor : LanguageBaseVisitor<ValueWrapper>
     public ValueWrapper result { get; private set; } = new VoidValue();
     public ValueWrapper defaultValue = new VoidValue();
     public string output = "";
-    private Environment currentEnvironment = new Environment(null);
+    private Environment currentEnvironment;
+
+    public CompilerVisitor(){
+        currentEnvironment = new Environment(null);
+        Embeded.Generate(currentEnvironment);
+    }
 
     //VisitValueWrapper
     public override ValueWrapper VisitInt(LanguageParser.IntContext context)
@@ -95,22 +100,6 @@ public class CompilerVisitor : LanguageBaseVisitor<ValueWrapper>
         return Visit(context.expr());
     }
 
-    //VisitPrintStmt
-    public override ValueWrapper VisitPrintStmt(LanguageParser.PrintStmtContext context)
-    {
-        ValueWrapper value = Visit(context.expr());
-        output += value switch
-        {
-            IntValue i => i.Value.ToString(),
-            FloatValue f => f.Value.ToString(),
-            StringValue s => s.Value,
-            BoolValue b => b.Value.ToString(),
-            VoidValue v => "void",
-            _ => throw new SemanticError("Invalid value", context.Start)
-        };
-        output += "\n";
-        return defaultValue;
-    }
 
     //VisitIdentifier
     public override ValueWrapper VisitIdentifier(LanguageParser.IdentifierContext context)
@@ -220,21 +209,40 @@ public class CompilerVisitor : LanguageBaseVisitor<ValueWrapper>
     //VisitWhileStmt
     public override ValueWrapper VisitWhileStmt(LanguageParser.WhileStmtContext context)
     {
+        //similar al for pero sin el visitForBody
         ValueWrapper condition = Visit(context.expr());
+        var lastEnvironment = currentEnvironment;
+
         if (condition is not BoolValue)
         {
             throw new SemanticError("Invalid condition", context.Start);
         }
-        while (((BoolValue)condition).Value)
+
+        try
         {
-            Visit(context.stmt());
-            condition = Visit(context.expr());
-            if (condition is not BoolValue)
+            while (((BoolValue)condition).Value)
             {
-                throw new SemanticError("Invalid condition", context.Start);
+                Visit(context.stmt());
+                condition = Visit(context.expr());
+                if (condition is not BoolValue)
+                {
+                    throw new SemanticError("Invalid condition", context.Start);
+                }
             }
         }
+        catch (BreakException)
+        {
+            currentEnvironment = lastEnvironment;
+        }
+        catch (ContinueException)
+        {
+            currentEnvironment = lastEnvironment;
+            condition = Visit(context.expr());
+            VisitWhileStmt(context);
+        }
+
         return defaultValue;
+
     }
 
     //VisitForStmt
@@ -325,4 +333,42 @@ public class CompilerVisitor : LanguageBaseVisitor<ValueWrapper>
 
         throw new ReturnException(value);
     }
+    //VisitCallee
+    public override ValueWrapper VisitCallee(LanguageParser.CalleeContext context)
+    {
+        ValueWrapper callee = Visit(context.expr());
+
+        foreach(var call in context.call())
+        {
+            if(callee is FunctionValue functionValue)
+            {
+                callee = VisitCall(functionValue.invocable, call.args());
+            }
+            else
+            {
+                throw new SemanticError("Invalid function call", context.Start);
+            }
+        }
+        return callee;
+    }
+
+    public ValueWrapper VisitCall(Invocable invocable, LanguageParser.ArgsContext context)
+    {
+        List<ValueWrapper> args = new List<ValueWrapper>();
+
+        if(context!=null){
+            foreach(var expr in context.expr())
+            {
+                args.Add(Visit(expr));
+            }
+        }
+
+        //if(context!=null && args.Count != invocable.Arity())
+        //{
+          //  throw new SemanticError("Invalid number of arguments", context.Start);
+        //}
+
+        return invocable.Invoke(args, this);
+    }
+    
 }
