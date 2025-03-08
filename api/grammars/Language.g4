@@ -4,18 +4,23 @@ program: dcl*;
 
 dcl: varDcl | stmt;
 
+varDcl: 'var' ID '=' expr ';';
+
 stmt: 
 expr ';' # ExprStmt
 | 'print(' expr ')' ';' # PrintStmt
 |'{' dcl* '}' # BlockStmt
 | 'if' '(' expr ')' stmt ('else' stmt)? # IfStmt
 | 'while' '(' expr ')' stmt # WhileStmt
-| 'for' '(' expr? ';' expr? ';' expr? ')' stmt # ForStmt
-| 'do' stmt 'while' '(' expr ')' ';' # DoWhileStmt;
+| 'for' '(' forInit expr ';' expr ')' stmt # ForStmt
+| 'do' stmt 'while' '(' expr ')' ';' # DoWhileStmt
+| 'break' ';' # BreakStmt
+| 'continue' ';' # ContinueStmt
+| 'return' expr? ';' # ReturnStmt;
 
 
 
-varDcl: 'var' ID '=' expr ';';
+forInit: varDcl | expr ';'; 
 
 expr:
 	 '-' expr						# Negate

@@ -2,31 +2,30 @@ using analyzer;
 
 public class CompilerVisitor : LanguageBaseVisitor<ValueWrapper>
 {
-
-    public ValueWrapper result { get; private set; }
+    public ValueWrapper result { get; private set; } = new VoidValue();
     public ValueWrapper defaultValue = new VoidValue();
     public string output = "";
     private Environment currentEnvironment = new Environment(null);
 
-//VisitValueWrapper
+    //VisitValueWrapper
     public override ValueWrapper VisitInt(LanguageParser.IntContext context)
     {
         return new IntValue(int.Parse(context.INT().GetText()));
     }
-    
-        //Negate    
+
+    //Negate    
     public override ValueWrapper VisitNegate(LanguageParser.NegateContext context)
     {
-       ValueWrapper value = Visit(context.expr());
-         return value switch
-         {
-              IntValue i => new IntValue(-i.Value),
-              FloatValue f => new FloatValue(-f.Value),
-              _ => throw new SemanticError("Invalid operation", context.Start)
-         };
+        ValueWrapper value = Visit(context.expr());
+        return value switch
+        {
+            IntValue i => new IntValue(-i.Value),
+            FloatValue f => new FloatValue(-f.Value),
+            _ => throw new SemanticError("Invalid operation", context.Start)
+        };
     }
 
-//VisitMulDiv
+    //VisitMulDiv
     public override ValueWrapper VisitMulDiv(LanguageParser.MulDivContext context)
     {
         var left = Visit(context.expr(0));
@@ -46,8 +45,7 @@ public class CompilerVisitor : LanguageBaseVisitor<ValueWrapper>
         };
     }
 
-//VisitAddSub
-
+    //VisitAddSub
     public override ValueWrapper VisitAddSub(LanguageParser.AddSubContext context)
     {
         var left = Visit(context.expr(0));
@@ -72,17 +70,17 @@ public class CompilerVisitor : LanguageBaseVisitor<ValueWrapper>
         };
     }
 
-//VisitProgram
+    //VisitProgram
     public override ValueWrapper VisitProgram(LanguageParser.ProgramContext context)
     {
-        foreach(var dcl in context.dcl())
+        foreach (var dcl in context.dcl())
         {
             Visit(dcl);
         }
         return defaultValue;
     }
 
-//VisitVarDcl
+    //VisitVarDcl
     public override ValueWrapper VisitVarDcl(LanguageParser.VarDclContext context)
     {
         string id = context.ID().GetText();
@@ -96,11 +94,13 @@ public class CompilerVisitor : LanguageBaseVisitor<ValueWrapper>
     {
         return Visit(context.expr());
     }
-    //VisitPrValueWrapperStmt
+
+    //VisitPrintStmt
     public override ValueWrapper VisitPrintStmt(LanguageParser.PrintStmtContext context)
     {
         ValueWrapper value = Visit(context.expr());
-        output +=  value switch {
+        output += value switch
+        {
             IntValue i => i.Value.ToString(),
             FloatValue f => f.Value.ToString(),
             StringValue s => s.Value,
@@ -111,12 +111,12 @@ public class CompilerVisitor : LanguageBaseVisitor<ValueWrapper>
         output += "\n";
         return defaultValue;
     }
-    
+
     //VisitIdentifier
     public override ValueWrapper VisitIdentifier(LanguageParser.IdentifierContext context)
     {
         string id = context.ID().GetText();
-        return currentEnvironment.GetVariable(id, context.Start); 
+        return currentEnvironment.GetVariable(id, context.Start);
     }
 
     //VisitFloat
@@ -153,7 +153,7 @@ public class CompilerVisitor : LanguageBaseVisitor<ValueWrapper>
             (FloatValue l, FloatValue r, ">") => new BoolValue(l.Value > r.Value),
             (FloatValue l, FloatValue r, "<=") => new BoolValue(l.Value <= r.Value),
             (FloatValue l, FloatValue r, ">=") => new BoolValue(l.Value >= r.Value),
-            _ => throw new SemanticError("Invalid operation" , context.Start)
+            _ => throw new SemanticError("Invalid operation", context.Start)
         };
     }
 
@@ -190,26 +190,27 @@ public class CompilerVisitor : LanguageBaseVisitor<ValueWrapper>
     {
         Environment previousEnvironment = currentEnvironment;
         currentEnvironment = new Environment(previousEnvironment);
-        foreach(var stmt in context.dcl())
+        foreach (var stmt in context.dcl())
         {
             Visit(stmt);
         }
         currentEnvironment = previousEnvironment;
         return defaultValue;
     }
+
     //VisitIfStmt
     public override ValueWrapper VisitIfStmt(LanguageParser.IfStmtContext context)
     {
         ValueWrapper condition = Visit(context.expr());
-        if(condition is not BoolValue)
+        if (condition is not BoolValue)
         {
             throw new SemanticError("Invalid condition", context.Start);
         }
-        if(((BoolValue)condition).Value)
+        if (((BoolValue)condition).Value)
         {
             Visit(context.stmt(0));
         }
-        else if(context.stmt().Length > 1)
+        else if (context.stmt().Length > 1)
         {
             Visit(context.stmt(1));
         }
@@ -220,47 +221,71 @@ public class CompilerVisitor : LanguageBaseVisitor<ValueWrapper>
     public override ValueWrapper VisitWhileStmt(LanguageParser.WhileStmtContext context)
     {
         ValueWrapper condition = Visit(context.expr());
-        if(condition is not BoolValue)
+        if (condition is not BoolValue)
         {
             throw new SemanticError("Invalid condition", context.Start);
         }
-        while(((BoolValue)condition).Value)
+        while (((BoolValue)condition).Value)
         {
             Visit(context.stmt());
             condition = Visit(context.expr());
-            if(condition is not BoolValue)
+            if (condition is not BoolValue)
             {
                 throw new SemanticError("Invalid condition", context.Start);
             }
         }
         return defaultValue;
     }
-    //VisitFor
+
+    //VisitForStmt
     public override ValueWrapper VisitForStmt(LanguageParser.ForStmtContext context)
     {
-        Visit(context.expr(0));
-        ValueWrapper condition = Visit(context.expr(1));
-        if(condition is not BoolValue)
+        Environment previousEnvironment = currentEnvironment;
+        currentEnvironment = new Environment(currentEnvironment);
+
+        Visit(context.forInit());
+        VisitForBody(context);
+
+        currentEnvironment = previousEnvironment;
+        return defaultValue;
+    }
+
+    public void VisitForBody(LanguageParser.ForStmtContext context)
+    {
+        ValueWrapper condition = Visit(context.expr(0));
+        var lastEnvironment = currentEnvironment;
+
+        if (condition is not BoolValue)
         {
             throw new SemanticError("Invalid condition", context.Start);
         }
-        while(((BoolValue)condition).Value)
+
+        try
         {
-            Visit(context.stmt());
-            Visit(context.expr(2));
-            condition = Visit(context.expr(1));
-            if(condition is not BoolValue)
+            while (condition is BoolValue boolCondition && boolCondition.Value)
             {
-                throw new SemanticError("Invalid condition", context.Start);
+                Visit(context.stmt());
+                Visit(context.expr(1));
+                condition = Visit(context.expr(0));
             }
         }
-        return defaultValue;
+        catch (BreakException)
+        {
+            currentEnvironment = lastEnvironment;
+        }
+        catch (ContinueException)
+        {
+            currentEnvironment = lastEnvironment;
+            Visit(context.expr(1));
+            VisitForBody(context);
+        }
     }
+
     //VisitDoWhileStmt
     public override ValueWrapper VisitDoWhileStmt(LanguageParser.DoWhileStmtContext context)
     {
         ValueWrapper condition = Visit(context.expr());
-        if(condition is not BoolValue)
+        if (condition is not BoolValue)
         {
             throw new SemanticError("Invalid condition", context.Start);
         }
@@ -268,12 +293,36 @@ public class CompilerVisitor : LanguageBaseVisitor<ValueWrapper>
         {
             Visit(context.stmt());
             condition = Visit(context.expr());
-            if(condition is not BoolValue)
+            if (condition is not BoolValue)
             {
                 throw new SemanticError("Invalid condition", context.Start);
             }
-        } while(((BoolValue)condition).Value);
+        } while (((BoolValue)condition).Value);
         return defaultValue;
     }
 
+    //VisitBreakStmt
+    public override ValueWrapper VisitBreakStmt(LanguageParser.BreakStmtContext context)
+    {
+        throw new BreakException();
+    }
+
+    //VisitContinueStmt
+    public override ValueWrapper VisitContinueStmt(LanguageParser.ContinueStmtContext context)
+    {
+        throw new ContinueException();
+    }
+
+    //VisitReturnStmt
+    public override ValueWrapper VisitReturnStmt(LanguageParser.ReturnStmtContext context)
+    {
+        ValueWrapper value = this.defaultValue;
+
+        if (context.expr() != null)
+        {
+            value = Visit(context.expr());
+        }
+
+        throw new ReturnException(value);
+    }
 }

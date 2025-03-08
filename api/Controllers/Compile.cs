@@ -65,6 +65,19 @@ namespace api.Controllers
             {
                 return BadRequest(new {error = e.Message});
             }
+            catch (ContinueException e)
+            {
+                return BadRequest(new {error = "Continue statement outside loop"});
+            }
+            catch (BreakException e)
+            {
+                return BadRequest(new {error = "Break statement outside loop"});
+            }
+            catch (ReturnException e)
+            {
+                return Ok(new {result = e.Value});
+            }
+        
             
         }
     }

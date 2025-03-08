@@ -45,6 +45,12 @@ public interface ILanguageVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitDcl([NotNull] LanguageParser.DclContext context);
 	/// <summary>
+	/// Visit a parse tree produced by <see cref="LanguageParser.varDcl"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitVarDcl([NotNull] LanguageParser.VarDclContext context);
+	/// <summary>
 	/// Visit a parse tree produced by the <c>ExprStmt</c>
 	/// labeled alternative in <see cref="LanguageParser.stmt"/>.
 	/// </summary>
@@ -94,11 +100,32 @@ public interface ILanguageVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitDoWhileStmt([NotNull] LanguageParser.DoWhileStmtContext context);
 	/// <summary>
-	/// Visit a parse tree produced by <see cref="LanguageParser.varDcl"/>.
+	/// Visit a parse tree produced by the <c>BreakStmt</c>
+	/// labeled alternative in <see cref="LanguageParser.stmt"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
-	Result VisitVarDcl([NotNull] LanguageParser.VarDclContext context);
+	Result VisitBreakStmt([NotNull] LanguageParser.BreakStmtContext context);
+	/// <summary>
+	/// Visit a parse tree produced by the <c>ContinueStmt</c>
+	/// labeled alternative in <see cref="LanguageParser.stmt"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitContinueStmt([NotNull] LanguageParser.ContinueStmtContext context);
+	/// <summary>
+	/// Visit a parse tree produced by the <c>ReturnStmt</c>
+	/// labeled alternative in <see cref="LanguageParser.stmt"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitReturnStmt([NotNull] LanguageParser.ReturnStmtContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="LanguageParser.forInit"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitForInit([NotNull] LanguageParser.ForInitContext context);
 	/// <summary>
 	/// Visit a parse tree produced by the <c>Float</c>
 	/// labeled alternative in <see cref="LanguageParser.expr"/>.
