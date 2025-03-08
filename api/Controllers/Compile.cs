@@ -9,6 +9,7 @@ using System.ComponentModel.DataAnnotations;
 using Antlr4.Runtime; // Agrega esta línea
 using analyzer; // Asegúrate de que esta línea esté presente
 using Antlr4.Runtime.Tree; // Para ParseTreeWalker
+using Antlr4.Runtime.Misc; // Para ParseTreeWalker
 
 namespace api.Controllers
 {
@@ -39,20 +40,32 @@ namespace api.Controllers
 
             var inputStream = new AntlrInputStream(request.code);
             var lexer = new LanguageLexer(inputStream);
+
+            lexer.RemoveErrorListeners();
+            lexer.AddErrorListener(new LexicalErrorListener());
+
             var tokens = new CommonTokenStream(lexer);
             var parser = new LanguageParser(tokens);
 
-            var tree = parser.program();
+            parser.RemoveErrorListeners();
+            parser.AddErrorListener(new SyntaxErrorListener());
 
-            var visitor = new CompilerVisitor();
-            visitor.Visit(tree);
-
-            return Ok(new {result = visitor.output});
-            //var walker = new ParseTreeWalker();
-            //var listener = new CompilerListener();
-            //walker.Walk(listener, tree);
-
-            //return Ok(new {result =listener.GetResult()});
+            try
+            {
+                var tree = parser.program();
+                var visitor = new CompilerVisitor();
+                visitor.Visit(tree);
+                return Ok(new {result = visitor.output});
+            }
+            catch (ParseCanceledException ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }   
+            catch (SemanticError e)
+            {
+                return BadRequest(new {error = e.Message});
+            }
+            
         }
     }
 }

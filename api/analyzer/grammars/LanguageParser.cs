@@ -40,7 +40,7 @@ public partial class LanguageParser : Parser {
 		T__0=1, T__1=2, T__2=3, T__3=4, T__4=5, T__5=6, T__6=7, T__7=8, T__8=9, 
 		T__9=10, T__10=11, T__11=12, T__12=13, T__13=14, T__14=15, T__15=16, T__16=17, 
 		T__17=18, T__18=19, T__19=20, T__20=21, T__21=22, T__22=23, INT=24, BOOL=25, 
-		FLOAT=26, STRING=27, WS=28, ID=29;
+		FLOAT=26, STRING=27, WS=28, ID=29, COMMENT=30, ML_COMMENT=31;
 	public const int
 		RULE_program = 0, RULE_dcl = 1, RULE_stmt = 2, RULE_varDcl = 3, RULE_expr = 4;
 	public static readonly string[] ruleNames = {
@@ -55,7 +55,7 @@ public partial class LanguageParser : Parser {
 	private static readonly string[] _SymbolicNames = {
 		null, null, null, null, null, null, null, null, null, null, null, null, 
 		null, null, null, null, null, null, null, null, null, null, null, null, 
-		"INT", "BOOL", "FLOAT", "STRING", "WS", "ID"
+		"INT", "BOOL", "FLOAT", "STRING", "WS", "ID", "COMMENT", "ML_COMMENT"
 	};
 	public static readonly IVocabulary DefaultVocabulary = new Vocabulary(_LiteralNames, _SymbolicNames);
 
@@ -967,7 +967,7 @@ public partial class LanguageParser : Parser {
 	}
 
 	private static int[] _serializedATN = {
-		4,1,29,117,2,0,7,0,2,1,7,1,2,2,7,2,2,3,7,3,2,4,7,4,1,0,5,0,12,8,0,10,0,
+		4,1,31,117,2,0,7,0,2,1,7,1,2,2,7,2,2,3,7,3,2,4,7,4,1,0,5,0,12,8,0,10,0,
 		12,0,15,9,0,1,1,1,1,3,1,19,8,1,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,
 		5,2,31,8,2,10,2,12,2,34,9,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,3,2,44,8,2,
 		1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,3,2,55,8,2,1,2,1,2,3,2,59,8,2,1,2,

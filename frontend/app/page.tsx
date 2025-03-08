@@ -6,25 +6,31 @@ const API_URL = 'http://localhost:5147';
 
 export default function Home() {
   const [code, setCode] = useState<string>('');
+  const [error, setError] = useState<string>('');
   const [output, setOutput] = useState<string>('');
 
-  const handleExecute = () => {
-    fetch(`${API_URL}/compile`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        code,
-      }),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        setOutput(data.result);
-      })
-      .catch((error) => {
-        console.error('Error:', error);
+  const handleExecute = async () => {
+    try {
+      const response = await fetch(`${API_URL}/compile`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ code }),
       });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Error desconocido');
+      }
+
+      setOutput(data.result);
+      setError('');
+    } catch (err) {
+      setOutput('');
+      setError(err instanceof Error ? err.message : 'Error desconocido');
+    }
   };
 
   return (
@@ -44,9 +50,15 @@ export default function Home() {
           Ejecutar
         </button>
         {output && (
-          <div className='mt-4 p-4 bg-black rounded-md shadow-md w-full max-h-60 overflow-auto'>
+          <div className='mt-4 p-4 bg-white rounded-md shadow-md w-full max-h-60 overflow-auto'>
             <h1 className='text-lg font-bold mb-2'>Output</h1>
-            <pre className='whitespace-pre-wrap'>{output}</pre>
+            <pre className='whitespace-pre-wrap text-black'>{output}</pre>
+          </div>
+        )}
+        {error && (
+          <div className='mt-4 p-4 bg-red-100 text-red-700 rounded-md shadow-md w-full max-h-60 overflow-auto'>
+            <h1 className='text-lg font-bold mb-2'>Error</h1>
+            <pre className='whitespace-pre-wrap'>{error}</pre>
           </div>
         )}
       </div>

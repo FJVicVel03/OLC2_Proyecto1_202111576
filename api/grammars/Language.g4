@@ -38,3 +38,6 @@ FLOAT: [0-9]+ '.' [0-9]+;
 STRING: '"' ~["]* '"';
 WS: [ \t\r\n]+ -> skip;
 ID: [a-zA-Z]+;
+COMMENT: '//' ~[\r\n]* -> skip;
+ML_COMMENT: '/*' .*? '*/' -> skip;
+
