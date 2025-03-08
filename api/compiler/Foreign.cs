@@ -1,0 +1,47 @@
+using analyzer;
+
+public class ForeignFunction : Invocable
+{
+    private Environment clousure;
+    private LanguageParser.FuncDclContext context;
+
+    public ForeignFunction(Environment clousure, LanguageParser.FuncDclContext context)
+    {
+        this.clousure = clousure;
+        this.context = context;
+    }
+
+    public int Arity()
+    {
+        return context.@params()?.ID().Length ?? 0; 
+    }
+
+    public ValueWrapper Invoke(List<ValueWrapper> args, CompilerVisitor visitor)
+    {
+        var newEnv = new Environment(clousure);
+        var beforeCallEnv = visitor.currentEnvironment;
+        visitor.currentEnvironment = newEnv;
+
+        if (context.@params() != null)
+        {
+            for (int i = 0; i < context.@params().ID().Length; i++)
+            {
+                newEnv.Declare(context.@params().ID(i).GetText(), args[i], null);
+            }
+        }
+        try
+        {
+            foreach (var stmt in context.dcl())
+            {
+                visitor.Visit(stmt);
+            }
+        }
+        catch (ReturnException e)
+        {
+            visitor.currentEnvironment = beforeCallEnv;
+            return e.Value; 
+        }
+        visitor.currentEnvironment = beforeCallEnv;
+        return visitor.defaultValue;
+    }
+}

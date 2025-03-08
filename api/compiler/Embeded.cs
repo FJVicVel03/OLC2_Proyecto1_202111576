@@ -2,8 +2,8 @@ public class Embeded
 {
     public static void Generate(Environment env)
     {
-        env.DeclareVariable("time", new FunctionValue(new TimeEmbeded(), "time"), null);
-        env.DeclareVariable("print", new FunctionValue(new PrintEmbeded(), "print"), null);
+        env.Declare("time", new FunctionValue(new TimeEmbeded(), "time"), null);
+        env.Declare("print", new FunctionValue(new PrintEmbeded(), "print"), null);
     }
 }
 

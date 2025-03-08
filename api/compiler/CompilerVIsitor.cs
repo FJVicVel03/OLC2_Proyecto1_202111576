@@ -5,7 +5,7 @@ public class CompilerVisitor : LanguageBaseVisitor<ValueWrapper>
     public ValueWrapper result { get; private set; } = new VoidValue();
     public ValueWrapper defaultValue = new VoidValue();
     public string output = "";
-    private Environment currentEnvironment;
+    public Environment currentEnvironment;
 
     public CompilerVisitor(){
         currentEnvironment = new Environment(null);
@@ -90,7 +90,7 @@ public class CompilerVisitor : LanguageBaseVisitor<ValueWrapper>
     {
         string id = context.ID().GetText();
         var value = Visit(context.expr());
-        currentEnvironment.DeclareVariable(id, value, context.Start);
+        currentEnvironment.Declare(id, value, context.Start);
         return defaultValue;
     }
 
@@ -105,7 +105,7 @@ public class CompilerVisitor : LanguageBaseVisitor<ValueWrapper>
     public override ValueWrapper VisitIdentifier(LanguageParser.IdentifierContext context)
     {
         string id = context.ID().GetText();
-        return currentEnvironment.GetVariable(id, context.Start);
+        return currentEnvironment.Get(id, context.Start);
     }
 
     //VisitFloat
@@ -171,7 +171,7 @@ public class CompilerVisitor : LanguageBaseVisitor<ValueWrapper>
     {
         string id = context.ID().GetText();
         ValueWrapper value = Visit(context.expr());
-        return currentEnvironment.AssignVariable(id, value, context.Start);
+        return currentEnvironment.Assign(id, value, context.Start);
     }
 
     //VisitBlockStmt
@@ -369,6 +369,14 @@ public class CompilerVisitor : LanguageBaseVisitor<ValueWrapper>
         //}
 
         return invocable.Invoke(args, this);
+    }
+
+    //VisitFuncDcl
+    public override ValueWrapper VisitFuncDcl(LanguageParser.FuncDclContext context)
+    {
+        var foreign = new ForeignFunction(currentEnvironment, context);
+        currentEnvironment.Declare(context.ID().GetText(), new FunctionValue(foreign, context.ID().GetText()), context.Start);
+        return defaultValue;
     }
     
 }

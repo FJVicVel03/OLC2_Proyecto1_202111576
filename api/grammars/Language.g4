@@ -2,9 +2,13 @@ grammar Language;
 
 program: dcl*;
 
-dcl: varDcl | stmt;
+dcl: varDcl | stmt | funcDcl;
 
 varDcl: 'var' ID '=' expr ';';
+
+funcDcl: 'function' ID '(' params? ')' '{' dcl* '}' ;
+
+params: ID (',' ID)*;
 
 stmt: 
 expr ';' # ExprStmt
