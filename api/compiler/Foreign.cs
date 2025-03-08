@@ -44,4 +44,10 @@ public class ForeignFunction : Invocable
         visitor.currentEnvironment = beforeCallEnv;
         return visitor.defaultValue;
     }
+
+    public ForeignFunction Bind(Instance instance){
+        var hiddenEnv = new Environment(clousure);
+        hiddenEnv.Declare("this", new InstanceValue(instance), null);
+        return new ForeignFunction(hiddenEnv, context);
+    }
 }

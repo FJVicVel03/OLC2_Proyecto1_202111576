@@ -2,11 +2,15 @@ grammar Language;
 
 program: dcl*;
 
-dcl: varDcl | stmt | funcDcl;
+dcl: varDcl | stmt | funcDcl | classDcl;
 
 varDcl: 'var' ID '=' expr ';';
 
 funcDcl: 'function' ID '(' params? ')' '{' dcl* '}' ;
+
+classDcl: 'class' ID '{' classBody* '}' ;
+
+classBody: varDcl | funcDcl;
 
 params: ID (',' ID)*;
 
@@ -33,15 +37,16 @@ expr:
 	| expr op = ('+' | '-') expr	# AddSub
 	| expr op = ('>' | '<' | '>=' | '<=') expr	# Relational
 	| expr op = ('==' | '!=') expr	# Equality
-	| ID '=' expr						# Assign	
+	| expr '=' expr						# Assign	
 	| BOOL							# Boolean
 	| FLOAT						# Float
 	| STRING						# String
 	| INT							# Int
+	| 'new' ID '(' args? ')'		# New
 	| ID							# Identifier
 	| '(' expr ')'			# Parens;
 	
-call: '(' args? ')';
+call: '(' args? ')' # FuncCall | '.' ID # Get; 
 args: expr (',' expr)*;	
 
 INT: [0-9]+;

@@ -100,7 +100,6 @@ public class CompilerVisitor : LanguageBaseVisitor<ValueWrapper>
         return Visit(context.expr());
     }
 
-
     //VisitIdentifier
     public override ValueWrapper VisitIdentifier(LanguageParser.IdentifierContext context)
     {
@@ -169,9 +168,38 @@ public class CompilerVisitor : LanguageBaseVisitor<ValueWrapper>
     //VisitAssign
     public override ValueWrapper VisitAssign(LanguageParser.AssignContext context)
     {
-        string id = context.ID().GetText();
-        ValueWrapper value = Visit(context.expr());
-        return currentEnvironment.Assign(id, value, context.Start);
+        var asignee = context.expr(0);
+        ValueWrapper value = Visit(context.expr(1));
+        if(asignee is LanguageParser.IdentifierContext idContext){
+            string id = idContext.ID().GetText(); // Corregir error tipográfico
+            currentEnvironment.Assign(id, value, context.Start);
+            return defaultValue;
+
+        }else if(asignee is LanguageParser.CalleeContext calleeContext){
+            ValueWrapper callee = Visit(calleeContext.expr());
+            for(int i = 0; i < calleeContext.call().Length; i++){
+                var action = calleeContext.call(i); // Corregir error tipográfico
+                if(i == calleeContext.call().Length - 1){
+                    if(action is LanguageParser.GetContext propertyAccess){
+                        if(callee is InstanceValue instanceValue){
+                            var instance = instanceValue.Instance; // Corregir error tipográfico
+                            var propertyName = propertyAccess.ID().GetText();
+                            instance.Set(propertyName, value);
+                        }else{
+                            throw new SemanticError("Invalid property access", context.Start);
+                        }
+                    }else{
+                        throw new SemanticError("Invalid assignment", context.Start);
+                    }
+
+                }
+
+                //REvisar
+            }
+        }else{
+            throw new SemanticError("Invalid assignment", context.Start);
+        }
+        return defaultValue;
     }
 
     //VisitBlockStmt
@@ -333,23 +361,32 @@ public class CompilerVisitor : LanguageBaseVisitor<ValueWrapper>
 
         throw new ReturnException(value);
     }
+
     //VisitCallee
     public override ValueWrapper VisitCallee(LanguageParser.CalleeContext context)
     {
         ValueWrapper callee = Visit(context.expr());
 
-        foreach(var call in context.call())
-        {
-            if(callee is FunctionValue functionValue)
-            {
-                callee = VisitCall(functionValue.invocable, call.args());
-            }
-            else
-            {
-                throw new SemanticError("Invalid function call", context.Start);
+        foreach (var action in context.call()){
+            if(action is LanguageParser.FuncCallContext funcCall){
+                
+                if(callee is FunctionValue functionValue){
+                    callee = VisitCall(functionValue.invocable, funcCall.args());
+                }
+                else
+                {
+                    throw new SemanticError("Invalid function call", context.Start);
+                }
+
+            }else if (action is LanguageParser.GetContext propertyAccess){
+                if(callee is InstanceValue instanceValue){
+                    callee = instanceValue.Instance.Get(propertyAccess.ID().GetText(), propertyAccess.Start); // Corregir error tipográfico
+                }else{
+                    throw new SemanticError("Invalid property access", context.Start);
+                }
             }
         }
-        return callee;
+        return callee; // Agregar retorno de callee
     }
 
     public ValueWrapper VisitCall(Invocable invocable, LanguageParser.ArgsContext context)
@@ -378,5 +415,51 @@ public class CompilerVisitor : LanguageBaseVisitor<ValueWrapper>
         currentEnvironment.Declare(context.ID().GetText(), new FunctionValue(foreign, context.ID().GetText()), context.Start);
         return defaultValue;
     }
-    
+
+    //VisitClassDcl
+    public override ValueWrapper VisitClassDcl(LanguageParser.ClassDclContext context){
+        Dictionary<string, LanguageParser.VarDclContext> props = new Dictionary<string, LanguageParser.VarDclContext>();
+        Dictionary<string, ForeignFunction> methods = new Dictionary<string, ForeignFunction>();
+
+        foreach(var prop in context.classBody()){
+            if(prop.varDcl() != null){
+                var varDcl = prop.varDcl();
+                props.Add(varDcl.ID().GetText(), varDcl);
+            }else if(prop.funcDcl() != null){
+                var funcDcl = prop.funcDcl();
+                var foreignFunction = new ForeignFunction(currentEnvironment, funcDcl);
+                methods.Add(funcDcl.ID().GetText(), foreignFunction);
+            }
+        }
+
+        LanguageClass languageClass = new LanguageClass(context.ID().GetText(), props, methods);
+        currentEnvironment.Declare(context.ID().GetText(), new ClassValue(languageClass), context.Start);
+
+        return defaultValue;      
+    }
+
+    //VisitNew
+    public override ValueWrapper VisitNew(LanguageParser.NewContext context)
+    {
+        ValueWrapper classValue = currentEnvironment.Get(context.ID().GetText(), context.Start);
+
+        if (classValue is not ClassValue)
+        {
+            throw new SemanticError("Invalid class", context.Start);
+        }
+
+        List<ValueWrapper> arguments = new List<ValueWrapper>();
+
+        if(context.args() != null)
+        {
+            foreach (var arg in context.args().expr())
+            {
+                arguments.Add(Visit(arg));
+            }
+        }
+
+        var instance = ((ClassValue)classValue).languageClass.Invoke(arguments, this);
+
+        return instance;
+    }
 }

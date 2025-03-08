@@ -10,5 +10,10 @@ public record BoolValue(bool Value) : ValueWrapper;
 
 public record FunctionValue(Invocable invocable, string name) : ValueWrapper;
 
+    
+public record InstanceValue(Instance Instance) : ValueWrapper;
+
+public record ClassValue(LanguageClass languageClass) : ValueWrapper;
+
 public record VoidValue : ValueWrapper;
 
