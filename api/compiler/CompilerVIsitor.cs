@@ -1,4 +1,5 @@
 using analyzer;
+using System.Globalization;
 
 public class CompilerVisitor : LanguageBaseVisitor<ValueWrapper>
 {
@@ -17,6 +18,7 @@ public class CompilerVisitor : LanguageBaseVisitor<ValueWrapper>
     {
         return new IntValue(int.Parse(context.INT().GetText()));
     }
+
 
     //Negate    
     public override ValueWrapper VisitNegate(LanguageParser.NegateContext context)
@@ -110,7 +112,7 @@ public class CompilerVisitor : LanguageBaseVisitor<ValueWrapper>
     //VisitFloat
     public override ValueWrapper VisitFloat(LanguageParser.FloatContext context)
     {
-        return new FloatValue(float.Parse(context.FLOAT().GetText()));
+        return new FloatValue(float.Parse(context.FLOAT().GetText(), CultureInfo.InvariantCulture));
     }
 
     //VisitBoolean
