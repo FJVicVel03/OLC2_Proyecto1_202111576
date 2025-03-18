@@ -34,48 +34,53 @@ public class CompilerVisitor : LanguageBaseVisitor<ValueWrapper>
 
     //VisitMulDiv
     public override ValueWrapper VisitMulDiv(LanguageParser.MulDivContext context)
+{
+    var left = Visit(context.expr(0)); // Evalúa el lado izquierdo
+    var right = Visit(context.expr(1)); // Evalúa el lado derecho
+    var op = context.op.Text;
+
+    return (left, right, op) switch
     {
-        var left = Visit(context.expr(0));
-        var right = Visit(context.expr(1));
-        var op = context.op.Text;
-        return (left, right, op) switch
-        {
-            (IntValue l, IntValue r, "*") => new IntValue(l.Value * r.Value),
-            (IntValue l, IntValue r, "/") => new IntValue(l.Value / r.Value),
-            (IntValue l, FloatValue r, "*") => new FloatValue(l.Value * r.Value),
-            (IntValue l, FloatValue r, "/") => new FloatValue(l.Value / r.Value),
-            (FloatValue l, IntValue r, "*") => new FloatValue(l.Value * r.Value),
-            (FloatValue l, IntValue r, "/") => new FloatValue(l.Value / r.Value),
-            (FloatValue l, FloatValue r, "*") => new FloatValue(l.Value * r.Value),
-            (FloatValue l, FloatValue r, "/") => new FloatValue(l.Value / r.Value),
-            _ => throw new SemanticError("Invalid operation", context.Start)
-        };
-    }
+        (IntValue l, IntValue r, "*") => new IntValue(l.Value * r.Value),
+        (IntValue l, IntValue r, "/") => r.Value != 0 
+            ? new FloatValue((float)l.Value / r.Value) // Convertir a flotante si es división
+            : throw new SemanticError("Division by zero", context.Start),
+        (FloatValue l, FloatValue r, "*") => new FloatValue(l.Value * r.Value),
+        (FloatValue l, FloatValue r, "/") => r.Value != 0 
+            ? new FloatValue(l.Value / r.Value)
+            : throw new SemanticError("Division by zero", context.Start),
+        (IntValue l, FloatValue r, "*") => new FloatValue(l.Value * r.Value),
+        (IntValue l, FloatValue r, "/") => r.Value != 0 
+            ? new FloatValue(l.Value / r.Value)
+            : throw new SemanticError("Division by zero", context.Start),
+        (FloatValue l, IntValue r, "*") => new FloatValue(l.Value * r.Value),
+        (FloatValue l, IntValue r, "/") => r.Value != 0 
+            ? new FloatValue(l.Value / r.Value)
+            : throw new SemanticError("Division by zero", context.Start),
+        _ => throw new SemanticError($"Invalid operation '{op}' between {left.GetType().Name} and {right.GetType().Name}", context.Start)
+    };
+}
 
     //VisitAddSub
     public override ValueWrapper VisitAddSub(LanguageParser.AddSubContext context)
+{
+    var left = Visit(context.expr(0)); // Evalúa el lado izquierdo
+    var right = Visit(context.expr(1)); // Evalúa el lado derecho
+    var op = context.op.Text;
+
+    return (left, right, op) switch
     {
-        var left = Visit(context.expr(0));
-        var right = Visit(context.expr(1));
-        var op = context.op.Text;
-        return (left, right, op) switch
-        {
-            (IntValue l, IntValue r, "+") => new IntValue(l.Value + r.Value),
-            (IntValue l, IntValue r, "-") => new IntValue(l.Value - r.Value),
-            (IntValue l, FloatValue r, "+") => new FloatValue(l.Value + r.Value),
-            (IntValue l, FloatValue r, "-") => new FloatValue(l.Value - r.Value),
-            (FloatValue l, IntValue r, "+") => new FloatValue(l.Value + r.Value),
-            (FloatValue l, IntValue r, "-") => new FloatValue(l.Value - r.Value),
-            (FloatValue l, FloatValue r, "+") => new FloatValue(l.Value + r.Value),
-            (FloatValue l, FloatValue r, "-") => new FloatValue(l.Value - r.Value),
-            (StringValue l, StringValue r, "+") => new StringValue(l.Value + r.Value),
-            (StringValue l, IntValue r, "+") => new StringValue(l.Value + r.Value.ToString()),
-            (StringValue l, FloatValue r, "+") => new StringValue(l.Value + r.Value.ToString()),
-            (IntValue l, StringValue r, "+") => new StringValue(l.Value.ToString() + r.Value),
-            (FloatValue l, StringValue r, "+") => new StringValue(l.Value.ToString() + r.Value),
-            _ => throw new SemanticError("Invalid operation", context.Start)
-        };
-    }
+        (IntValue l, IntValue r, "+") => new IntValue(l.Value + r.Value),
+        (IntValue l, IntValue r, "-") => new IntValue(l.Value - r.Value),
+        (FloatValue l, FloatValue r, "+") => new FloatValue(l.Value + r.Value),
+        (FloatValue l, FloatValue r, "-") => new FloatValue(l.Value - r.Value),
+        (IntValue l, FloatValue r, "+") => new FloatValue(l.Value + r.Value),
+        (IntValue l, FloatValue r, "-") => new FloatValue(l.Value - r.Value),
+        (FloatValue l, IntValue r, "+") => new FloatValue(l.Value + r.Value),
+        (FloatValue l, IntValue r, "-") => new FloatValue(l.Value - r.Value),
+        _ => throw new SemanticError($"Invalid operation '{op}' between {left.GetType().Name} and {right.GetType().Name}", context.Start)
+    };
+}
 
     //VisitProgram
     public override ValueWrapper VisitProgram(LanguageParser.ProgramContext context)
@@ -170,6 +175,14 @@ public class CompilerVisitor : LanguageBaseVisitor<ValueWrapper>
 
     // Convertir a byte (rango 0-255)
     return new RuneValue((byte)runeChar);
+}
+
+    //VisitParens
+
+    public override ValueWrapper VisitParens(LanguageParser.ParensContext context)
+{
+    // Evalúa la expresión dentro de los paréntesis
+    return Visit(context.expr());
 }
 
     //VisitRelational
