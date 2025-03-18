@@ -15,6 +15,12 @@ public record InstanceValue(Instance Instance) : ValueWrapper;
 
 public record ClassValue(LanguageClass languageClass) : ValueWrapper;
 
-public record RuneValue(byte Value) : ValueWrapper;
+public record RuneValue(byte Value) : ValueWrapper
+{
+    public override global::System.String ToString()
+    {
+        return ((char)Value).ToString();
+    }
+}
 public record VoidValue : ValueWrapper;
 

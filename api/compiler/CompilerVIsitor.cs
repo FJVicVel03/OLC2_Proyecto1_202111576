@@ -33,7 +33,7 @@ public class CompilerVisitor : LanguageBaseVisitor<ValueWrapper>
     }
 
     //VisitMulDiv
-    public override ValueWrapper VisitMulDiv(LanguageParser.MulDivContext context)
+ public override ValueWrapper VisitMulDiv(LanguageParser.MulDivContext context)
 {
     var left = Visit(context.expr(0)); // Evalúa el lado izquierdo
     var right = Visit(context.expr(1)); // Evalúa el lado derecho
@@ -49,13 +49,13 @@ public class CompilerVisitor : LanguageBaseVisitor<ValueWrapper>
         (FloatValue l, FloatValue r, "/") => r.Value != 0 
             ? new FloatValue(l.Value / r.Value)
             : throw new SemanticError("Division by zero", context.Start),
-        (IntValue l, FloatValue r, "*") => new FloatValue(l.Value * r.Value),
+        (IntValue l, FloatValue r, "*") => new FloatValue(l.Value * r.Value), // Promoción a float
         (IntValue l, FloatValue r, "/") => r.Value != 0 
-            ? new FloatValue(l.Value / r.Value)
+            ? new FloatValue(l.Value / r.Value) // Promoción a float
             : throw new SemanticError("Division by zero", context.Start),
-        (FloatValue l, IntValue r, "*") => new FloatValue(l.Value * r.Value),
+        (FloatValue l, IntValue r, "*") => new FloatValue(l.Value * r.Value), // Promoción a float
         (FloatValue l, IntValue r, "/") => r.Value != 0 
-            ? new FloatValue(l.Value / r.Value)
+            ? new FloatValue(l.Value / r.Value) // Promoción a float
             : throw new SemanticError("Division by zero", context.Start),
         _ => throw new SemanticError($"Invalid operation '{op}' between {left.GetType().Name} and {right.GetType().Name}", context.Start)
     };
@@ -74,10 +74,11 @@ public class CompilerVisitor : LanguageBaseVisitor<ValueWrapper>
         (IntValue l, IntValue r, "-") => new IntValue(l.Value - r.Value),
         (FloatValue l, FloatValue r, "+") => new FloatValue(l.Value + r.Value),
         (FloatValue l, FloatValue r, "-") => new FloatValue(l.Value - r.Value),
-        (IntValue l, FloatValue r, "+") => new FloatValue(l.Value + r.Value),
-        (IntValue l, FloatValue r, "-") => new FloatValue(l.Value - r.Value),
-        (FloatValue l, IntValue r, "+") => new FloatValue(l.Value + r.Value),
-        (FloatValue l, IntValue r, "-") => new FloatValue(l.Value - r.Value),
+        (IntValue l, FloatValue r, "+") => new FloatValue(l.Value + r.Value), // Promoción a float
+        (IntValue l, FloatValue r, "-") => new FloatValue(l.Value - r.Value), // Promoción a float
+        (FloatValue l, IntValue r, "+") => new FloatValue(l.Value + r.Value), // Promoción a float
+        (FloatValue l, IntValue r, "-") => new FloatValue(l.Value - r.Value), // Promoción a float
+        (StringValue l, StringValue r, "+") => new StringValue(l.Value + r.Value), // Concatenación de cadenas
         _ => throw new SemanticError($"Invalid operation '{op}' between {left.GetType().Name} and {right.GetType().Name}", context.Start)
     };
 }
@@ -141,7 +142,7 @@ public override ValueWrapper VisitVarDcl(LanguageParser.VarDclContext context)
     return type switch
     {
         "int" => value is IntValue,
-        "float" => value is FloatValue,
+        "float" => value is FloatValue || value is IntValue, // Permitir conversión implícita de int a float
         "string" => value is StringValue,
         "bool" => value is BoolValue,
         "rune" => value is RuneValue,
@@ -190,11 +191,19 @@ public override ValueWrapper VisitVarDcl(LanguageParser.VarDclContext context)
     //VisitString
     public override ValueWrapper VisitString(LanguageParser.StringContext context)
     {
-        return new StringValue(context.STRING().GetText());
+    string stringText = context.STRING().GetText();
+
+    // Eliminar las comillas dobles
+    if (stringText.StartsWith("\"") && stringText.EndsWith("\""))
+    {
+        stringText = stringText.Substring(1, stringText.Length - 2);
+    }
+
+    return new StringValue(stringText);
     }
 
     //VisitRune
-    public override ValueWrapper VisitRune(LanguageParser.RuneContext context)
+public override ValueWrapper VisitRune(LanguageParser.RuneContext context)
 {
     string runeText = context.RUNE().GetText();
     char runeChar;
@@ -223,7 +232,12 @@ public override ValueWrapper VisitVarDcl(LanguageParser.VarDclContext context)
         runeChar = runeText[0];
     }
 
-    // Convertir a byte (rango 0-255)
+    // Validar rango (0-255)
+    if (runeChar > 255)
+    {
+        throw new SemanticError($"Rune value '{runeChar}' is out of range (0-255)", context.Start);
+    }
+
     return new RuneValue((byte)runeChar);
 }
 
