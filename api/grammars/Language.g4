@@ -4,7 +4,10 @@ program: dcl*;
 
 dcl: varDcl | stmt | funcDcl | classDcl;
 
-varDcl: 'var' ID '=' expr ';';
+varDcl: 'var' ID ':' type ('=' expr)? ';'   
+		| 'var' ID '=' expr ';';
+
+type: 'int' | 'float' | 'bool' | 'string' | 'rune';
 
 funcDcl: 'function' ID '(' params? ')' '{' dcl* '}' ;
 

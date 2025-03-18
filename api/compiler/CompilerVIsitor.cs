@@ -93,23 +93,73 @@ public class CompilerVisitor : LanguageBaseVisitor<ValueWrapper>
     }
 
     //VisitVarDcl
-    public override ValueWrapper VisitVarDcl(LanguageParser.VarDclContext context)
+public override ValueWrapper VisitVarDcl(LanguageParser.VarDclContext context)
 {
     string id = context.ID().GetText();
     ValueWrapper value;
 
-    if (context.expr() != null)
+    // Declaración implícita
+    if (context.expr() != null && context.type() == null)
     {
         value = Visit(context.expr());
+        currentEnvironment.Declare(id, value, context.Start);
+    }
+    // Declaración explícita con tipo
+    else if (context.type() != null)
+    {
+        string type = context.type().GetText();
+
+        // Declaración explícita con tipo y valor
+        if (context.expr() != null)
+        {
+            value = Visit(context.expr());
+
+            // Verificar que el tipo declarado coincida con el tipo del valor asignado
+            if (!IsTypeCompatible(type, value))
+            {
+                throw new SemanticError($"Type mismatch: Cannot assign value of type '{value.GetType().Name}' to variable '{id}' of type '{type}'", context.Start);
+            }
+        }
+        // Declaración explícita con tipo pero sin valor
+        else
+        {
+            value = GetDefaultValue(type);
+        }
+
+        currentEnvironment.Declare(id, value, context.Start);
     }
     else
     {
-        // Asignar valor por defecto según el tipo
-        value = new VoidValue(); // Valor por defecto si no se especifica
+        throw new SemanticError($"Invalid variable declaration for '{id}'", context.Start);
     }
 
-    currentEnvironment.Declare(id, value, context.Start);
     return defaultValue;
+}
+
+    private bool IsTypeCompatible(string type, ValueWrapper value)
+{
+    return type switch
+    {
+        "int" => value is IntValue,
+        "float" => value is FloatValue,
+        "string" => value is StringValue,
+        "bool" => value is BoolValue,
+        "rune" => value is RuneValue,
+        _ => false
+    };
+}
+
+    private ValueWrapper GetDefaultValue(string type)
+{
+    return type switch
+    {
+        "int" => new IntValue(0),
+        "float" => new FloatValue(0.0f),
+        "string" => new StringValue(""),
+        "bool" => new BoolValue(false),
+        "rune" => new RuneValue(0),
+        _ => throw new SemanticError($"Unknown type '{type}'", null)
+    };
 }
 
     //VisitExprStmt
