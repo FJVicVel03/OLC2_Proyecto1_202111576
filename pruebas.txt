@@ -1,0 +1,10 @@
+var IdValido = 5;
+var id_Valido=1;
+var i1d_valido5 = 3;
+var _value = 4;
+
+print(IdValido);
+print(id_Valido);
+print(i1d_valido5);
+print(_value);
+

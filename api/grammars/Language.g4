@@ -54,7 +54,7 @@ BOOL: 'true' | 'false';
 FLOAT: [0-9]+ '.' [0-9]+;
 STRING: '"' ~["]* '"';
 WS: [ \t\r\n]+ -> skip;
-ID: [a-zA-Z]+;
+ID: [a-zA-Z_][a-zA-Z0-9_]*;
 COMMENT: '//' ~[\r\n]* -> skip;
 ML_COMMENT: '/*' .*? '*/' -> skip;
 
