@@ -89,11 +89,11 @@ public class CompilerVisitor : LanguageBaseVisitor<ValueWrapper>
 
     //VisitVarDcl
     public override ValueWrapper VisitVarDcl(LanguageParser.VarDclContext context)
-    {
-        string id = context.ID().GetText();
-        var value = Visit(context.expr());
-        currentEnvironment.Declare(id, value, context.Start);
-        return defaultValue;
+    {   
+    string id = context.ID().GetText();
+    var value = Visit(context.expr());
+    currentEnvironment.Declare(id, value, context.Start);
+    return defaultValue;
     }
 
     //VisitExprStmt
@@ -169,40 +169,68 @@ public class CompilerVisitor : LanguageBaseVisitor<ValueWrapper>
 
     //VisitAssign
     public override ValueWrapper VisitAssign(LanguageParser.AssignContext context)
+{
+    var asignee = context.expr(0);
+    ValueWrapper value = Visit(context.expr(1));
+
+    // Asignación a una variable
+    if (asignee is LanguageParser.IdentifierContext idContext)
     {
-        var asignee = context.expr(0);
-        ValueWrapper value = Visit(context.expr(1));
-        if(asignee is LanguageParser.IdentifierContext idContext){
-            string id = idContext.ID().GetText(); // Corregir error tipográfico
+        string id = idContext.ID().GetText();
+        try
+        {
             currentEnvironment.Assign(id, value, context.Start);
-            return defaultValue;
-
-        }else if(asignee is LanguageParser.CalleeContext calleeContext){
-            ValueWrapper callee = Visit(calleeContext.expr());
-            for(int i = 0; i < calleeContext.call().Length; i++){
-                var action = calleeContext.call(i); // Corregir error tipográfico
-                if(i == calleeContext.call().Length - 1){
-                    if(action is LanguageParser.GetContext propertyAccess){
-                        if(callee is InstanceValue instanceValue){
-                            var instance = instanceValue.Instance; // Corregir error tipográfico
-                            var propertyName = propertyAccess.ID().GetText();
-                            instance.Set(propertyName, value);
-                        }else{
-                            throw new SemanticError("Invalid property access", context.Start);
-                        }
-                    }else{
-                        throw new SemanticError("Invalid assignment", context.Start);
-                    }
-
-                }
-
-                //REvisar
-            }
-        }else{
-            throw new SemanticError("Invalid assignment", context.Start);
+        }
+        catch (SemanticError e)
+        {
+            throw new SemanticError($"Error assigning to variable '{id}': {e.Message}", context.Start);
         }
         return defaultValue;
     }
+    // Asignación a una propiedad de una instancia
+    else if (asignee is LanguageParser.CalleeContext calleeContext)
+    {
+        ValueWrapper callee = Visit(calleeContext.expr());
+        for (int i = 0; i < calleeContext.call().Length; i++)
+        {
+            var action = calleeContext.call(i);
+            if (i == calleeContext.call().Length - 1)
+            {
+                if (action is LanguageParser.GetContext propertyAccess)
+                {
+                    if (callee is InstanceValue instanceValue)
+                    {
+                        var instance = instanceValue.Instance;
+                        var propertyName = propertyAccess.ID().GetText();
+
+                        // Verificar el tipo de la propiedad antes de asignar
+                        try
+                        {
+                            instance.Set(propertyName, value);
+                        }
+                        catch (SemanticError e)
+                        {
+                            throw new SemanticError($"Error assigning to property '{propertyName}': {e.Message}", context.Start);
+                        }
+                    }
+                    else
+                    {
+                        throw new SemanticError("Invalid property access: Target is not an instance", context.Start);
+                    }
+                }
+                else
+                {
+                    throw new SemanticError("Invalid assignment: Unsupported action", context.Start);
+                }
+            }
+        }
+        return defaultValue;
+    }
+    else
+    {
+        throw new SemanticError("Invalid assignment target", context.Start);
+    }
+}
 
     //VisitBlockStmt
     public override ValueWrapper VisitBlockStmt(LanguageParser.BlockStmtContext context)
