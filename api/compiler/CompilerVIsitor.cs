@@ -89,12 +89,23 @@ public class CompilerVisitor : LanguageBaseVisitor<ValueWrapper>
 
     //VisitVarDcl
     public override ValueWrapper VisitVarDcl(LanguageParser.VarDclContext context)
-    {   
+{
     string id = context.ID().GetText();
-    var value = Visit(context.expr());
+    ValueWrapper value;
+
+    if (context.expr() != null)
+    {
+        value = Visit(context.expr());
+    }
+    else
+    {
+        // Asignar valor por defecto según el tipo
+        value = new VoidValue(); // Valor por defecto si no se especifica
+    }
+
     currentEnvironment.Declare(id, value, context.Start);
     return defaultValue;
-    }
+}
 
     //VisitExprStmt
     public override ValueWrapper VisitExprStmt(LanguageParser.ExprStmtContext context)
@@ -126,6 +137,40 @@ public class CompilerVisitor : LanguageBaseVisitor<ValueWrapper>
     {
         return new StringValue(context.STRING().GetText());
     }
+
+    //VisitRune
+    public override ValueWrapper VisitRune(LanguageParser.RuneContext context)
+{
+    string runeText = context.RUNE().GetText();
+    char runeChar;
+
+    // Eliminar las comillas simples
+    if (runeText.StartsWith("'") && runeText.EndsWith("'"))
+    {
+        runeText = runeText.Substring(1, runeText.Length - 2);
+    }
+
+    // Manejar caracteres escapados
+    if (runeText.StartsWith("\\"))
+    {
+        runeChar = runeText switch
+        {
+            "\\n" => '\n',
+            "\\t" => '\t',
+            "\\'" => '\'',
+            "\\\\" => '\\',
+            _ => throw new SemanticError($"Invalid escape sequence: {runeText}", context.Start)
+        };
+    }
+    else
+    {
+        // Caracter normal
+        runeChar = runeText[0];
+    }
+
+    // Convertir a byte (rango 0-255)
+    return new RuneValue((byte)runeChar);
+}
 
     //VisitRelational
     public override ValueWrapper VisitRelational(LanguageParser.RelationalContext context)

@@ -15,5 +15,6 @@ public record InstanceValue(Instance Instance) : ValueWrapper;
 
 public record ClassValue(LanguageClass languageClass) : ValueWrapper;
 
+public record RuneValue(byte Value) : ValueWrapper;
 public record VoidValue : ValueWrapper;
 

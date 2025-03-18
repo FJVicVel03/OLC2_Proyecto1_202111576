@@ -42,6 +42,7 @@ expr:
 	| FLOAT						# Float
 	| STRING						# String
 	| INT							# Int
+	| RUNE							# Rune
 	| 'new' ID '(' args? ')'		# New
 	| ID							# Identifier
 	| '(' expr ')'			# Parens;
@@ -53,6 +54,7 @@ INT: [0-9]+;
 BOOL: 'true' | 'false';
 FLOAT: [0-9]+ '.' [0-9]+;
 STRING: '"' ~["]* '"';
+RUNE: '\'' (~['\\] | '\\' .) '\''; 
 WS: [ \t\r\n]+ -> skip;
 ID: [a-zA-Z_][a-zA-Z0-9_]*;
 COMMENT: '//' ~[\r\n]* -> skip;
