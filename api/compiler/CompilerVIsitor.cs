@@ -747,17 +747,32 @@ public override ValueWrapper VisitRune(LanguageParser.RuneContext context)
     //VisitPrint
     public override ValueWrapper VisitPrintStmt(LanguageParser.PrintStmtContext context)
 {
-    var value = Visit(context.expr());
-    var printFunction = currentEnvironment.Get("fmt.Println", context.Start);
+    var output = "";
 
-    if (printFunction is FunctionValue functionValue)
+    // Si hay argumentos, procesarlos
+    if (context.args() != null)
     {
-        functionValue.invocable.Invoke(new List<ValueWrapper> { value }, this);
+        foreach (var arg in context.args().expr())
+        {
+            var value = Visit(arg);
+
+            // Convertir el valor a cadena según su tipo
+            output += value switch
+            {
+                IntValue i => i.Value.ToString(),
+                FloatValue f => f.Value.ToString(CultureInfo.InvariantCulture),
+                StringValue s => s.Value,
+                BoolValue b => b.Value.ToString(),
+                VoidValue _ => "void",
+                _ => throw new SemanticError($"Unsupported type in fmt.Println: {value.GetType().Name}", context.Start)
+            };
+
+            output += " "; // Agregar un espacio entre los argumentos
+        }
     }
-    else
-    {
-        throw new SemanticError("Function 'fmt.Println' not found", context.Start);
-    }
+
+    // Acumular el resultado en la propiedad `output` para el frontend
+    this.output += output.TrimEnd() + "\n";
 
     return defaultValue;
 }
@@ -810,5 +825,71 @@ public override ValueWrapper VisitRune(LanguageParser.RuneContext context)
             return Visit(context.stmt());
         }
         return defaultValue;
+    }
+
+    //VisitForConditionStmt
+    public override ValueWrapper VisitForConditionStmt(LanguageParser.ForConditionStmtContext context)
+    {
+    // Evaluar la condición inicial
+    ValueWrapper condition = Visit(context.expr());
+    if (condition is not BoolValue)
+    {
+        throw new SemanticError("Invalid condition in for loop", context.Start);
+    }
+
+    // Ejecutar el cuerpo del bucle mientras la condición sea verdadera
+    while (((BoolValue)condition).Value)
+    {
+        foreach (var stmt in context.stmt())
+        {
+            Visit(stmt);
+        }
+
+        // Reevaluar la condición
+        condition = Visit(context.expr());
+        if (condition is not BoolValue)
+        {
+            throw new SemanticError("Invalid condition in for loop", context.Start);
+        }
+    }
+
+    return defaultValue;
+    }
+
+    //VisitIncDec
+    public override ValueWrapper VisitIncDec(LanguageParser.IncDecContext context)
+{
+    // Obtener el identificador desde el subárbol expr
+    if (context.expr() is LanguageParser.IdentifierContext idContext)
+    {
+        string id = idContext.ID().GetText();
+        var variable = currentEnvironment.Get(id, context.Start);
+
+        // Verificar que la variable sea de tipo IntValue
+        if (variable is IntValue intVar)
+        {
+            // Determinar si es incremento (++) o decremento (--)
+            if (context.GetChild(1).GetText() == "++")
+            {
+                variable = new IntValue(intVar.Value + 1);
+            }
+            else if (context.GetChild(1).GetText() == "--")
+            {
+                variable = new IntValue(intVar.Value - 1);
+            }
+
+            // Actualizar el valor de la variable en el entorno
+            currentEnvironment.Assign(id, variable, context.Start);
+            return defaultValue;
+        }
+        else
+        {
+            throw new SemanticError("Invalid operation: Only integers can be incremented or decremented", context.Start);
+        }
+    }
+    else
+    {
+        throw new SemanticError("Invalid increment/decrement target", context.Start);
+    }
     }
 }

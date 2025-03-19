@@ -3,8 +3,176 @@ var id_Valido=1;
 var i1d_valido5 = 3;
 var _value = 4;
 
-print(IdValido);
-print(id_Valido);
-print(i1d_valido5);
-print(_value);
+fmt.Println(IdValido);
+fmt.Println(id_Valido);
+fmt.Println(i1d_valido5);
+fmt.Println(_value);
 
+
+var variable = 10;
+var Variable = 20;
+
+fmt.Println(variable); // Debería imprimir 10
+fmt.Println(Variable); // Debería imprimir 20
+
+// Esto es un comentario de una línea
+/*
+Esto es un comentario multilínea
+*/
+
+var x = 10;
+x = 20; // Correcto, ambos son enteros
+
+//var y = 10;
+//y = 0.5; // Error: No se puede asignar un flotante a una variable entera
+
+fmt.Println(x);
+//fmt.Println(y);
+
+
+
+var result = 3 - (1 + 3) * 32 / 90; // 1.5
+fmt.Println(result); 
+
+var a: int = 4;
+var b: float = 14.3;
+fmt.Println(a);
+fmt.Println(b);
+
+fmt.Println (a+b);
+
+//Probar desde acá
+
+var result: float = 3+(1+3)/8*3;
+
+fmt.Println(result);
+
+var result1: int = 3 + 2; // Debería imprimir 4 (int)
+var resultado: float = 4;
+fmt.Println(resultado);
+fmt.Println(result1);
+
+var s1: string = "ho";
+var s2: string = "la";
+
+fmt.Println(s1+s2);
+
+var a: int;
+fmt.Println(a);
+var b: float;
+fmt.Println(b);
+var c: bool;
+fmt.Println(c);
+var d: string;
+fmt.Println(d);
+
+fmt.Println(10/3);
+fmt.Println(10%3);
+
+var var1: int = 10;
+var var2: float = 0.0;
+var str: string = "cad";
+
+var1 += 10; // var1 = 20
+fmt.Println(var1);
+
+var2 += 10; // var2 = 10.0
+fmt.Println(var2);
+
+var2 += 10.0; // var2 = 20.0
+fmt.Println(var2);
+
+str += "cad"; // str = "cadcad"
+fmt.Println(str);
+
+fmt.Println(5>6.0);
+fmt.Println(6.0>=1);
+fmt.Println(5>=5.0);
+var a = 2;
+fmt.Println(a<3);
+
+
+var a: bool = true;
+var b: bool = true;
+
+fmt.Println(a&&a);
+fmt.Println(a||b);
+fmt.Println(!a);
+
+
+a = true;
+b = false;
+
+fmt.Println(a&&a);
+fmt.Println(a||b);
+fmt.Println(!a);
+
+a = false;
+b = true;
+
+fmt.Println(a&&a);
+fmt.Println(a||b);
+fmt.Println(!a);
+
+a = false;
+b = false;
+
+fmt.Println(a&&a);
+fmt.Println(a||b);
+fmt.Println(!a);
+
+var numero: int = 21;
+
+if numero > 20 {
+    fmt.Println("El número es mayor que 20");
+} else if numero == 10 {
+    fmt.Println("El número es igual a 10");
+} else {
+    fmt.Println("El número es menor que 10");
+}
+
+var numero = 1;
+
+switch numero {
+ case 1:
+ fmt.Println("Uno"); // Se ejecuta si numero == 1
+ case 2:
+ fmt.Println("Dos"); // Se ejecuta si numero == 2
+ case 3:
+ fmt.Println("Tres"); // Se ejecuta si numero == 3
+ default:
+ fmt.Println("Número inválido"); // Se ejecuta si ninguno de los casos coincide
+}
+
+
+var i: int;
+
+for i := 0; i < 10; i++ {
+ if i == 5 {
+ fmt.Println("Se encontró un break en i =", i);
+ break; // Finaliza el bucle cuando i es igual a 5
+ }
+ fmt.Println(i);
+}
+
+var i: int;
+
+for i := 1; i <= 5; i++ {
+ fmt.Println(i);
+}
+
+var i: int;
+
+for i <= 5 {
+ fmt.Println(i);
+ i++;
+}
+
+var i: int;
+
+for i := 1; i <= 5; i++ {
+ if i % 2 == 0 {
+     continue; // Salta a la siguiente iteración si i es par
+ }
+ fmt.Println(i); // Solo imprime números impares
+}

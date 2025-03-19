@@ -19,11 +19,12 @@ params: ID (',' ID)*;
 
 stmt: 
 expr ';' # ExprStmt
-| 'fmt.Println(' expr ')' ';' # PrintStmt
+| 'fmt.Println(' args? ')' ';' # PrintStmt
 | '{' dcl* '}' # BlockStmt
 | 'if'  expr  stmt ('else if' expr stmt)* ('else' stmt)? # IfStmt
 | 'while' '(' expr ')' stmt # WhileStmt
-| 'for' '(' forInit expr ';' expr ')' stmt # ForStmt
+| 'for' expr '{' stmt* '}' # ForConditionStmt // Variante condicional
+| 'for'  forInit expr ';' expr  stmt # ForStmt
 | 'do' stmt 'while' '(' expr ')' ';' # DoWhileStmt
 | 'switch'  expr  '{' switchCase* '}' # SwitchStmt
 | 'case' expr ':' stmt # CaseStatement
@@ -50,7 +51,8 @@ expr:
 	| expr op = ('==' | '!=') expr	# Equality
 	| expr op = ('+=' | '-=') expr	# AssignOp
 	| expr op = ('&&' | '||') expr	# Logical
-	| expr '=' expr						# Assign	
+	| expr ('='| ':=') expr			# Assign
+	| expr ('++' | '--')			# IncDec
 	| BOOL							# Boolean
 	| FLOAT						# Float
 	| STRING						# String
