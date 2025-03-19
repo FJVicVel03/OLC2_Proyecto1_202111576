@@ -268,6 +268,18 @@ public override ValueWrapper VisitRune(LanguageParser.RuneContext context)
             (FloatValue l, FloatValue r, ">") => new BoolValue(l.Value > r.Value),
             (FloatValue l, FloatValue r, "<=") => new BoolValue(l.Value <= r.Value),
             (FloatValue l, FloatValue r, ">=") => new BoolValue(l.Value >= r.Value),
+            (IntValue l, FloatValue r, "<") => new BoolValue(l.Value < r.Value),
+            (IntValue l, FloatValue r, ">") => new BoolValue(l.Value > r.Value),
+            (IntValue l, FloatValue r, "<=") => new BoolValue(l.Value <= r.Value),
+            (IntValue l, FloatValue r, ">=") => new BoolValue(l.Value >= r.Value),
+            (FloatValue l, IntValue r, "<") => new BoolValue(l.Value < r.Value),
+            (FloatValue l, IntValue r, ">") => new BoolValue(l.Value > r.Value),
+            (FloatValue l, IntValue r, "<=") => new BoolValue(l.Value <= r.Value),
+            (FloatValue l, IntValue r, ">=") => new BoolValue(l.Value >= r.Value),
+            (RuneValue l, RuneValue r, "<") => new BoolValue(l.Value < r.Value),
+            (RuneValue l, RuneValue r, ">") => new BoolValue(l.Value > r.Value),
+            (RuneValue l, RuneValue r, "<=") => new BoolValue(l.Value <= r.Value),
+            (RuneValue l, RuneValue r, ">=") => new BoolValue(l.Value >= r.Value),
             _ => throw new SemanticError("Invalid operation", context.Start)
         };
     }
@@ -679,4 +691,32 @@ public override ValueWrapper VisitRune(LanguageParser.RuneContext context)
         throw new SemanticError("Invalid assignment target", context.Start);
     }
 }
+
+  //VisitLogical
+    public override ValueWrapper VisitLogical(LanguageParser.LogicalContext context)
+    {
+        var left = Visit(context.expr(0));
+        var right = Visit(context.expr(1));
+        var op = context.op.Text;
+        return (left, right, op) switch
+        {
+            (BoolValue l, BoolValue r, "&&") => new BoolValue(l.Value && r.Value),
+            (BoolValue l, BoolValue r, "||") => new BoolValue(l.Value || r.Value),
+            _ => throw new SemanticError("Invalid operation", context.Start)
+        };
+    }
+
+    //VisitNot
+    public override ValueWrapper VisitNot(LanguageParser.NotContext context)
+    {
+        var value = Visit(context.expr());
+        if (value is BoolValue boolValue)
+        {
+            return new BoolValue(!boolValue.Value);
+        }
+        else
+        {
+            throw new SemanticError("Invalid operation", context.Start);
+        }
+    }
 }

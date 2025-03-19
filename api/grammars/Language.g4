@@ -35,12 +35,14 @@ forInit: varDcl | expr ';';
 
 expr:
 	 '-' expr						# Negate
+	|'!' expr						# Not
 	| expr call+ 				# Callee 
 	| expr op = ('*' | '/' | '%') expr	# MulDiv
 	| expr op = ('+' | '-') expr	# AddSub
 	| expr op = ('>' | '<' | '>=' | '<=') expr	# Relational
 	| expr op = ('==' | '!=') expr	# Equality
 	| expr op = ('+=' | '-=') expr	# AssignOp
+	| expr op = ('&&' | '||') expr	# Logical
 	| expr '=' expr						# Assign	
 	| BOOL							# Boolean
 	| FLOAT						# Float
