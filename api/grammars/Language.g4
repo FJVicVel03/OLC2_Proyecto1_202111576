@@ -20,16 +20,23 @@ params: ID (',' ID)*;
 stmt: 
 expr ';' # ExprStmt
 | 'fmt.Println(' expr ')' ';' # PrintStmt
-|'{' dcl* '}' # BlockStmt
-| 'if' '(' expr ')' stmt ('else if' '(' expr ')' stmt)* ('else' stmt)? # IfStmt
+| '{' dcl* '}' # BlockStmt
+| 'if'  expr  stmt ('else if' expr stmt)* ('else' stmt)? # IfStmt
 | 'while' '(' expr ')' stmt # WhileStmt
 | 'for' '(' forInit expr ';' expr ')' stmt # ForStmt
 | 'do' stmt 'while' '(' expr ')' ';' # DoWhileStmt
+| 'switch'  expr  '{' switchCase* '}' # SwitchStmt
+| 'case' expr ':' stmt # CaseStatement
+| 'default' ':' stmt # DefaultCaseStmt
 | 'break' ';' # BreakStmt
 | 'continue' ';' # ContinueStmt
 | 'return' expr? ';' # ReturnStmt;
 
+switchCase: caseStmt | defaultStmt;
 
+caseStmt: 'case' expr ':' stmt;
+
+defaultStmt: 'default' ':' stmt;
 
 forInit: varDcl | expr ';'; 
 
