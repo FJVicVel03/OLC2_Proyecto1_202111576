@@ -3,6 +3,7 @@ public class Embeded
     public static void Generate(Environment env)
     {
         env.Declare("time", new FunctionValue(new TimeEmbeded(), "time"), null);
+        env.Declare("fmt.Println", new FunctionValue(new PrintEmbeded(), "fmt.Println"), null);
         env.Declare("print", new FunctionValue(new PrintEmbeded(), "print"), null);
     }
 }

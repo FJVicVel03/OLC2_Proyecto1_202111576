@@ -19,7 +19,7 @@ params: ID (',' ID)*;
 
 stmt: 
 expr ';' # ExprStmt
-//| 'print(' expr ')' ';' # PrintStmt
+| 'fmt.Println(' expr ')' ';' # PrintStmt
 |'{' dcl* '}' # BlockStmt
 | 'if' '(' expr ')' stmt ('else' stmt)? # IfStmt
 | 'while' '(' expr ')' stmt # WhileStmt

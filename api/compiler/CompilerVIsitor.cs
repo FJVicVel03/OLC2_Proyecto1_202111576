@@ -719,4 +719,22 @@ public override ValueWrapper VisitRune(LanguageParser.RuneContext context)
             throw new SemanticError("Invalid operation", context.Start);
         }
     }
+
+    //VisitPrint
+    public override ValueWrapper VisitPrintStmt(LanguageParser.PrintStmtContext context)
+{
+    var value = Visit(context.expr());
+    var printFunction = currentEnvironment.Get("fmt.Println", context.Start);
+
+    if (printFunction is FunctionValue functionValue)
+    {
+        functionValue.invocable.Invoke(new List<ValueWrapper> { value }, this);
+    }
+    else
+    {
+        throw new SemanticError("Function 'fmt.Println' not found", context.Start);
+    }
+
+    return defaultValue;
+}
 }
