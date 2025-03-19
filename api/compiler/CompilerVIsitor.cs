@@ -283,11 +283,17 @@ public override ValueWrapper VisitRune(LanguageParser.RuneContext context)
             (IntValue l, IntValue r, "==") => new BoolValue(l.Value == r.Value),
             (IntValue l, IntValue r, "!=") => new BoolValue(l.Value != r.Value),
             (FloatValue l, FloatValue r, "==") => new BoolValue(l.Value == r.Value),
+            (IntValue l, FloatValue r, "==") => new BoolValue(l.Value == r.Value),
+            (FloatValue l, IntValue r, "==") => new BoolValue(l.Value == r.Value),
+            (IntValue l, FloatValue r, "!=") => new BoolValue(l.Value != r.Value),
+            (FloatValue l, IntValue r, "!=") => new BoolValue(l.Value != r.Value),
             (FloatValue l, FloatValue r, "!=") => new BoolValue(l.Value != r.Value),
             (StringValue l, StringValue r, "==") => new BoolValue(l.Value == r.Value),
             (StringValue l, StringValue r, "!=") => new BoolValue(l.Value != r.Value),
             (BoolValue l, BoolValue r, "==") => new BoolValue(l.Value == r.Value),
             (BoolValue l, BoolValue r, "!=") => new BoolValue(l.Value != r.Value),
+            (RuneValue l, RuneValue r, "==") => new BoolValue(l.Value == r.Value),
+            (RuneValue l, RuneValue r, "!=") => new BoolValue(l.Value != r.Value),  
             _ => throw new SemanticError("Invalid operation", context.Start)
         };
     }
