@@ -93,6 +93,22 @@ public override ValueWrapper VisitMulDiv(LanguageParser.MulDivContext context)
         {
             Visit(dcl);
         }
+
+        if(currentEnvironment.Get("main", null) is FunctionValue main)
+        {
+            try
+            {
+                main.invocable.Invoke(new List<ValueWrapper>(), this);
+            }
+            catch (ReturnException e)
+            {
+                result = e.Value;
+            }
+        }
+        else
+        {
+            throw new SemanticError("Main function not found", context.Start);
+        }
         return defaultValue;
     }
 
@@ -892,4 +908,6 @@ public override ValueWrapper VisitRune(LanguageParser.RuneContext context)
         throw new SemanticError("Invalid increment/decrement target", context.Start);
     }
     }
+
+    
 }

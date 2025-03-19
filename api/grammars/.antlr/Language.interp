@@ -9,7 +9,7 @@ null
 'bool'
 'string'
 'rune'
-'function'
+'func'
 '('
 ')'
 '{'

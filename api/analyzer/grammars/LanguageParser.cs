@@ -58,12 +58,11 @@ public partial class LanguageParser : Parser {
 
 	private static readonly string[] _LiteralNames = {
 		null, "'var'", "':'", "'='", "';'", "'int'", "'float'", "'bool'", "'string'", 
-		"'rune'", "'function'", "'('", "')'", "'{'", "'}'", "'class'", "','", 
-		"'fmt.Println('", "'if'", "'else if'", "'else'", "'while'", "'for'", "'do'", 
-		"'switch'", "'case'", "'default'", "'break'", "'continue'", "'return'", 
-		"'-'", "'!'", "'*'", "'/'", "'%'", "'+'", "'>'", "'<'", "'>='", "'<='", 
-		"'=='", "'!='", "'+='", "'-='", "'&&'", "'||'", "':='", "'++'", "'--'", 
-		"'new'", "'.'"
+		"'rune'", "'func'", "'('", "')'", "'{'", "'}'", "'class'", "','", "'fmt.Println('", 
+		"'if'", "'else if'", "'else'", "'while'", "'for'", "'do'", "'switch'", 
+		"'case'", "'default'", "'break'", "'continue'", "'return'", "'-'", "'!'", 
+		"'*'", "'/'", "'%'", "'+'", "'>'", "'<'", "'>='", "'<='", "'=='", "'!='", 
+		"'+='", "'-='", "'&&'", "'||'", "':='", "'++'", "'--'", "'new'", "'.'"
 	};
 	private static readonly string[] _SymbolicNames = {
 		null, null, null, null, null, null, null, null, null, null, null, null, 

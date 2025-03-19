@@ -4,6 +4,7 @@ public class ForeignFunction : Invocable
 {
     private Environment clousure;
     private LanguageParser.FuncDclContext context;
+    private static bool mainExecuted = false; // Bandera para verificar si `main` fue ejecutada
 
     public ForeignFunction(Environment clousure, LanguageParser.FuncDclContext context)
     {
@@ -18,6 +19,18 @@ public class ForeignFunction : Invocable
 
     public ValueWrapper Invoke(List<ValueWrapper> args, CompilerVisitor visitor)
     {
+        // Verificar si `main` ya fue ejecutada
+        if (!mainExecuted && context.ID().GetText() != "main")
+        {
+            throw new SemanticError("Cannot execute functions before 'main' is executed", context.Start);
+        }
+
+        // Si es `main`, marcar como ejecutada
+        if (context.ID().GetText() == "main")
+        {
+            mainExecuted = true;
+        }
+
         var newEnv = new Environment(clousure);
         var beforeCallEnv = visitor.currentEnvironment;
         visitor.currentEnvironment = newEnv;
@@ -41,7 +54,15 @@ public class ForeignFunction : Invocable
             visitor.currentEnvironment = beforeCallEnv;
             return e.Value; 
         }
-        visitor.currentEnvironment = beforeCallEnv;
+        finally
+        {
+            // Restaurar el entorno anterior
+            visitor.currentEnvironment = beforeCallEnv;
+
+            // Propagar la salida acumulada
+            //visitor.output += visitor.output; // Asegurarse de que la salida se acumule correctamente
+        }
+
         return visitor.defaultValue;
     }
 

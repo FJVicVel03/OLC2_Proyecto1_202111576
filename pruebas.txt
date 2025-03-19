@@ -176,3 +176,14 @@ for i := 1; i <= 5; i++ {
  }
  fmt.Println(i); // Solo imprime números impares
 }
+
+
+func main() {
+    fmt.Println("Hola, mundo!");
+    otraFuncion();
+}
+
+func otraFuncion() {
+    fmt.Println("Esto fue llamado desde main");
+}
+

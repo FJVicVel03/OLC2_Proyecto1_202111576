@@ -9,7 +9,7 @@ varDcl: 'var' ID ':' type ('=' expr)? ';'
 
 type: 'int' | 'float' | 'bool' | 'string' | 'rune';
 
-funcDcl: 'function' ID '(' params? ')' '{' dcl* '}' ;
+funcDcl: 'func' ID '(' params? ')' '{' dcl* '}' ;
 
 classDcl: 'class' ID '{' classBody* '}' ;
 

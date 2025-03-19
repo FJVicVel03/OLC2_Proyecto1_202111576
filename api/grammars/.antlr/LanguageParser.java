@@ -41,12 +41,11 @@ public class LanguageParser extends Parser {
 	private static String[] makeLiteralNames() {
 		return new String[] {
 			null, "'var'", "':'", "'='", "';'", "'int'", "'float'", "'bool'", "'string'", 
-			"'rune'", "'function'", "'('", "')'", "'{'", "'}'", "'class'", "','", 
-			"'fmt.Println('", "'if'", "'else if'", "'else'", "'while'", "'for'", 
-			"'do'", "'switch'", "'case'", "'default'", "'break'", "'continue'", "'return'", 
-			"'-'", "'!'", "'*'", "'/'", "'%'", "'+'", "'>'", "'<'", "'>='", "'<='", 
-			"'=='", "'!='", "'+='", "'-='", "'&&'", "'||'", "':='", "'++'", "'--'", 
-			"'new'", "'.'"
+			"'rune'", "'func'", "'('", "')'", "'{'", "'}'", "'class'", "','", "'fmt.Println('", 
+			"'if'", "'else if'", "'else'", "'while'", "'for'", "'do'", "'switch'", 
+			"'case'", "'default'", "'break'", "'continue'", "'return'", "'-'", "'!'", 
+			"'*'", "'/'", "'%'", "'+'", "'>'", "'<'", "'>='", "'<='", "'=='", "'!='", 
+			"'+='", "'-='", "'&&'", "'||'", "':='", "'++'", "'--'", "'new'", "'.'"
 		};
 	}
 	private static final String[] _LITERAL_NAMES = makeLiteralNames();
