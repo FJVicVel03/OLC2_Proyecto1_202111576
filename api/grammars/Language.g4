@@ -40,6 +40,7 @@ expr:
 	| expr op = ('+' | '-') expr	# AddSub
 	| expr op = ('>' | '<' | '>=' | '<=') expr	# Relational
 	| expr op = ('==' | '!=') expr	# Equality
+	| expr op = ('+=' | '-=') expr	# AssignOp
 	| expr '=' expr						# Assign	
 	| BOOL							# Boolean
 	| FLOAT						# Float

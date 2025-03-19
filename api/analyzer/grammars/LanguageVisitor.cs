@@ -255,6 +255,13 @@ public interface ILanguageVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitRune([NotNull] LanguageParser.RuneContext context);
 	/// <summary>
+	/// Visit a parse tree produced by the <c>AssignOp</c>
+	/// labeled alternative in <see cref="LanguageParser.expr"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitAssignOp([NotNull] LanguageParser.AssignOpContext context);
+	/// <summary>
 	/// Visit a parse tree produced by the <c>FuncCall</c>
 	/// labeled alternative in <see cref="LanguageParser.call"/>.
 	/// </summary>

@@ -617,4 +617,60 @@ public override ValueWrapper VisitRune(LanguageParser.RuneContext context)
 
         return instance;
     }
+
+
+    //VisitAssignOp
+    public override ValueWrapper VisitAssignOp(LanguageParser.AssignOpContext context)
+{
+    var asignee = context.expr(0); // Variable a la que se asignará el valor
+    var value = Visit(context.expr(1)); // Valor a sumar o restar
+    var op = context.op.Text; // Operador (+= o -=)
+
+    if (asignee is LanguageParser.IdentifierContext idContext)
+    {
+        string id = idContext.ID().GetText();
+        var variable = currentEnvironment.Get(id, context.Start);
+
+        // Verificar el tipo de la variable y realizar la operación
+        if (variable is IntValue intVar && value is IntValue intValue)
+        {
+            if (op == "+=")
+            {
+                variable = new IntValue(intVar.Value + intValue.Value);
+            }
+            else if (op == "-=")
+            {
+                variable = new IntValue(intVar.Value - intValue.Value);
+            }
+        }
+        else if (variable is FloatValue floatVar && (value is FloatValue || value is IntValue))
+            {
+                float operand = value is FloatValue floatValue ? floatValue.Value : ((IntValue)value).Value;
+                if (op == "+=")
+                {
+                    variable = new FloatValue(floatVar.Value + operand);
+                }
+                else if (op == "-=")
+                {
+                    variable = new FloatValue(floatVar.Value - operand);
+                }
+            }
+        else if (variable is StringValue strVar && value is StringValue strValue && op == "+=")
+        {
+            variable = new StringValue(strVar.Value + strValue.Value); // Concatenación de cadenas
+        }
+        else
+        {
+            throw new SemanticError($"Invalid operation '{op}' between {variable.GetType().Name} and {value.GetType().Name}", context.Start);
+        }
+
+        // Actualizar el valor de la variable en el entorno
+        currentEnvironment.Assign(id, variable, context.Start);
+        return defaultValue;
+    }
+    else
+    {
+        throw new SemanticError("Invalid assignment target", context.Start);
+    }
+}
 }
