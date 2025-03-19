@@ -390,22 +390,46 @@ public override ValueWrapper VisitRune(LanguageParser.RuneContext context)
 
     //VisitIfStmt
     public override ValueWrapper VisitIfStmt(LanguageParser.IfStmtContext context)
+{
+    // Evaluar la condición del if (primera expresión)
+    ValueWrapper condition = Visit(context.expr(0));
+    if (condition is not BoolValue)
     {
-        ValueWrapper condition = Visit(context.expr());
-        if (condition is not BoolValue)
-        {
-            throw new SemanticError("Invalid condition", context.Start);
-        }
-        if (((BoolValue)condition).Value)
-        {
-            Visit(context.stmt(0));
-        }
-        else if (context.stmt().Length > 1)
-        {
-            Visit(context.stmt(1));
-        }
-        return defaultValue;
+        throw new SemanticError("Invalid condition", context.Start);
     }
+
+    // Si la condición es verdadera, ejecutar el primer bloque
+    if (((BoolValue)condition).Value)
+    {
+        Visit(context.stmt(0));
+    }
+    else
+    {
+        // Evaluar los bloques else if y else
+        for (int i = 1; i < context.expr().Length; i++)
+        {
+            condition = Visit(context.expr(i));
+            if (condition is not BoolValue)
+            {
+                throw new SemanticError("Invalid condition", context.Start);
+            }
+
+            if (((BoolValue)condition).Value)
+            {
+                Visit(context.stmt(i));
+                return defaultValue;
+            }
+        }
+
+        // Si hay un bloque else, ejecutarlo
+        if (context.stmt().Length > context.expr().Length)
+        {
+            Visit(context.stmt(context.stmt().Length - 1));
+        }
+    }
+
+    return defaultValue;
+        }   
 
     //VisitWhileStmt
     public override ValueWrapper VisitWhileStmt(LanguageParser.WhileStmtContext context)
