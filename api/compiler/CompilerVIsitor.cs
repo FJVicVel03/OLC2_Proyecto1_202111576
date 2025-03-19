@@ -33,7 +33,7 @@ public class CompilerVisitor : LanguageBaseVisitor<ValueWrapper>
     }
 
     //VisitMulDiv
- public override ValueWrapper VisitMulDiv(LanguageParser.MulDivContext context)
+public override ValueWrapper VisitMulDiv(LanguageParser.MulDivContext context)
 {
     var left = Visit(context.expr(0)); // Evalúa el lado izquierdo
     var right = Visit(context.expr(1)); // Evalúa el lado derecho
@@ -43,19 +43,22 @@ public class CompilerVisitor : LanguageBaseVisitor<ValueWrapper>
     {
         (IntValue l, IntValue r, "*") => new IntValue(l.Value * r.Value),
         (IntValue l, IntValue r, "/") => r.Value != 0 
-            ? new FloatValue((float)l.Value / r.Value) // Convertir a flotante si es división
+            ? new IntValue(l.Value / r.Value)
+            : throw new SemanticError("Division by zero", context.Start),
+        (IntValue l, IntValue r, "%") => r.Value != 0 
+            ? new IntValue(l.Value % r.Value) // Módulo
             : throw new SemanticError("Division by zero", context.Start),
         (FloatValue l, FloatValue r, "*") => new FloatValue(l.Value * r.Value),
         (FloatValue l, FloatValue r, "/") => r.Value != 0 
             ? new FloatValue(l.Value / r.Value)
             : throw new SemanticError("Division by zero", context.Start),
-        (IntValue l, FloatValue r, "*") => new FloatValue(l.Value * r.Value), // Promoción a float
+        (IntValue l, FloatValue r, "*") => new FloatValue(l.Value * r.Value),
         (IntValue l, FloatValue r, "/") => r.Value != 0 
-            ? new FloatValue(l.Value / r.Value) // Promoción a float
+            ? new FloatValue(l.Value / r.Value)
             : throw new SemanticError("Division by zero", context.Start),
-        (FloatValue l, IntValue r, "*") => new FloatValue(l.Value * r.Value), // Promoción a float
+        (FloatValue l, IntValue r, "*") => new FloatValue(l.Value * r.Value),
         (FloatValue l, IntValue r, "/") => r.Value != 0 
-            ? new FloatValue(l.Value / r.Value) // Promoción a float
+            ? new FloatValue(l.Value / r.Value)
             : throw new SemanticError("Division by zero", context.Start),
         _ => throw new SemanticError($"Invalid operation '{op}' between {left.GetType().Name} and {right.GetType().Name}", context.Start)
     };

@@ -36,7 +36,7 @@ forInit: varDcl | expr ';';
 expr:
 	 '-' expr						# Negate
 	| expr call+ 				# Callee 
-	| expr op = ('*' | '/') expr	# MulDiv
+	| expr op = ('*' | '/' | '%') expr	# MulDiv
 	| expr op = ('+' | '-') expr	# AddSub
 	| expr op = ('>' | '<' | '>=' | '<=') expr	# Relational
 	| expr op = ('==' | '!=') expr	# Equality
