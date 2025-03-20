@@ -2,10 +2,12 @@ grammar Language;
 
 program: dcl*;
 
-dcl: varDcl | stmt | funcDcl | classDcl;
+dcl: varDcl | stmt | funcDcl | classDcl |expr;
 
-varDcl: 'var' ID ':' type ('=' expr)? ';'   
-		| 'var' ID '=' expr ';';
+varDcl: 'var' ID ':' type ('=' expr)?    
+		| 'var' ID '=' expr
+		| ID ':=' expr;
+
 
 type: 'int' | 'float' | 'bool' | 'string' | 'rune';
 
@@ -15,11 +17,12 @@ classDcl: 'class' ID '{' classBody* '}' ;
 
 classBody: varDcl | funcDcl;
 
-params: ID (',' ID)*;
+params: ID (',' ID)*
+		| 'var' ID ':' type (',' 'var' ID':' type)*;
 
 stmt: 
 expr ';' # ExprStmt
-| 'fmt.Println(' args? ')' ';' # PrintStmt
+| 'fmt.Println(' args? ')' # PrintStmt
 | '{' dcl* '}' # BlockStmt
 | 'if'  expr  stmt ('else if' expr stmt)* ('else' stmt)? # IfStmt
 | 'while' '(' expr ')' stmt # WhileStmt
