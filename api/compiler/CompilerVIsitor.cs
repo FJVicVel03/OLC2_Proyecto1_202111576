@@ -1074,5 +1074,37 @@ public override ValueWrapper VisitRune(LanguageParser.RuneContext context)
         // Retornar la cantidad de elementos en el slice
         return new IntValue(sliceValue.Elements.Count);
     }
+
+    public override ValueWrapper VisitAppendCall(LanguageParser.AppendCallContext context)
+    {
+        // Obtener el slice al que se le agregarán elementos
+        var slice = Visit(context.expr(0));
+
+        // Verificar que el primer argumento sea un slice
+        if (slice is not SliceValue sliceValue)
+        {
+            throw new SemanticError("The first argument to append must be a slice", context.Start);
+        }
+
+        // Crear una copia del slice original
+        var newElements = new List<ValueWrapper>(sliceValue.Elements);
+
+        // Agregar los elementos adicionales al slice
+        for (int i = 1; i < context.expr().Length; i++)
+        {
+            var element = Visit(context.expr(i));
+
+            // Verificar que el tipo del elemento sea compatible con el tipo del slice
+            if (!IsTypeCompatible(sliceValue.Type, element))
+            {
+                throw new SemanticError($"Cannot append element of type '{element.GetType().Name}' to slice of type '{sliceValue.Type}'", context.Start);
+            }
+
+            newElements.Add(element);
+        }
+
+        // Retornar un nuevo slice con los elementos añadidos
+        return new SliceValue(sliceValue.Type, newElements);
+    }
     
 }

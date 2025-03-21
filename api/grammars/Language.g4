@@ -61,6 +61,7 @@ expr:
 	| 'slices.Index' '(' expr ',' expr ')' #SliceIndexCall
 	| 'strings.Join' '(' expr ',' expr ')' #StringsJoinCall
 	| 'len' '(' expr ')' #LenCall
+	| 'append' '(' expr ',' expr (',' expr)* ')' #AppendCall
 	| BOOL							# Boolean
 	| FLOAT						# Float
 	| STRING						# String
