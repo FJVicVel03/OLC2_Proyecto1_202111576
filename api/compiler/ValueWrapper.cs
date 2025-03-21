@@ -22,5 +22,14 @@ public record RuneValue(byte Value) : ValueWrapper
         return ((char)Value).ToString();
     }
 }
+
+public record SliceValue(string Type, List<ValueWrapper> Elements) : ValueWrapper
+{
+    public override string ToString()
+    {
+        return "[" + string.Join(", ", Elements) + "]";
+    }
+}
+
 public record VoidValue : ValueWrapper;
 

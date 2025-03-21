@@ -44,6 +44,8 @@ public class PrintEmbeded : Invocable
                 BoolValue b => output += b.Value.ToString() + " ",
                 VoidValue v => output += "void" + " ",
                 FunctionValue fn => output += "<fn " + fn.name + ">" + " ",
+                SliceValue sl => output += sl.ToString() + " ",
+                RuneValue r => output += r.ToString() + " ",
                 _ => throw new SemanticError("Invalid value", null)
             };
         }

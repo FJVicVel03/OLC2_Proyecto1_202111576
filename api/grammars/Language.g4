@@ -8,7 +8,6 @@ varDcl: 'var' ID ':' type ('=' expr)?
 		| 'var' ID '=' expr
 		| ID ':=' expr;
 
-
 type: 'int' | 'float' | 'bool' | 'string' | 'rune';
 
 funcDcl: 'func' ID '(' params? ')' '{' dcl* '}' ;
@@ -56,6 +55,9 @@ expr:
 	| expr op = ('&&' | '||') expr	# Logical
 	| expr ('='| ':=') expr			# Assign
 	| expr ('++' | '--')			# IncDec
+	| '[]' type '{' expr (',' expr)* '}' #SliceInit
+	| expr '[' expr ']' #SliceAccess
+	| expr '[' expr ':' expr ']' #SliceRange
 	| BOOL							# Boolean
 	| FLOAT						# Float
 	| STRING						# String
@@ -71,10 +73,12 @@ args: expr (',' expr)*;
 INT: [0-9]+;
 BOOL: 'true' | 'false';
 FLOAT: [0-9]+ '.' [0-9]+;
-STRING: '"' ~["]* '"';
-RUNE: '\'' (~['\\] | '\\' .) '\''; 
+STRING: '"' (ESC_SEQ | ~["\\])* '"';
+RUNE: '\'' (ESC_SEQ | ~['\\]) '\'';
 WS: [ \t\r\n]+ -> skip;
 ID: [a-zA-Z_][a-zA-Z0-9_]*;
 COMMENT: '//' ~[\r\n]* -> skip;
 ML_COMMENT: '/*' .*? '*/' -> skip;
+//Secuencias de escape
+ESC_SEQ: '\\' ('n' | 'r' | 't' | 'b' | 'f' | '"' | '\'' | '\\') -> skip;
 

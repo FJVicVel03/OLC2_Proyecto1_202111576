@@ -122,7 +122,16 @@ public override ValueWrapper VisitVarDcl(LanguageParser.VarDclContext context)
     if (context.expr() != null && context.type() == null)
     {
         value = Visit(context.expr());
-        currentEnvironment.Declare(id, value, context.Start);
+
+        // Verificar si es un SliceInit
+        if (value is SliceValue sliceValue)
+        {
+            currentEnvironment.Declare(id, sliceValue, context.Start);
+        }
+        else
+        {
+            currentEnvironment.Declare(id, value, context.Start);
+        }
     }
     // Declaración explícita con tipo
     else if (context.type() != null)
@@ -210,15 +219,18 @@ public override ValueWrapper VisitVarDcl(LanguageParser.VarDclContext context)
     //VisitString
     public override ValueWrapper VisitString(LanguageParser.StringContext context)
     {
-    string stringText = context.STRING().GetText();
+        string text = context.STRING().GetText();
 
-    // Eliminar las comillas dobles
-    if (stringText.StartsWith("\"") && stringText.EndsWith("\""))
-    {
-        stringText = stringText.Substring(1, stringText.Length - 2);
-    }
+        // Eliminar las comillas dobles
+        if (text.StartsWith("\"") && text.EndsWith("\""))
+        {
+            text = text.Substring(1, text.Length - 2);
+        }
 
-    return new StringValue(stringText);
+        // Manejar caracteres escapados
+        text = text.Replace("\\n", "\n").Replace("\\t", "\t").Replace("\\\"", "\"").Replace("\\\\", "\\");
+
+        return new StringValue(text);
     }
 
     //VisitRune
@@ -762,36 +774,51 @@ public override ValueWrapper VisitRune(LanguageParser.RuneContext context)
 
     //VisitPrint
     public override ValueWrapper VisitPrintStmt(LanguageParser.PrintStmtContext context)
-{
-    var output = "";
-
-    // Si hay argumentos, procesarlos
-    if (context.args() != null)
     {
-        foreach (var arg in context.args().expr())
+        var output = "";
+
+        // Si hay argumentos, procesarlos
+        if (context.args() != null)
         {
-            var value = Visit(arg);
-
-            // Convertir el valor a cadena según su tipo
-            output += value switch
+            foreach (var arg in context.args().expr())
             {
-                IntValue i => i.Value.ToString(),
-                FloatValue f => f.Value.ToString(CultureInfo.InvariantCulture),
-                StringValue s => s.Value,
-                BoolValue b => b.Value.ToString(),
-                VoidValue _ => "void",
-                _ => throw new SemanticError($"Unsupported type in fmt.Println: {value.GetType().Name}", context.Start)
-            };
+                var value = Visit(arg);
 
-            output += " "; // Agregar un espacio entre los argumentos
+                // Convertir el valor a cadena según su tipo
+                output += value switch
+                {
+                    IntValue i => i.Value.ToString(),
+                    FloatValue f => f.Value.ToString(CultureInfo.InvariantCulture),
+                    StringValue s => s.Value,
+                    BoolValue b => b.Value.ToString(),
+                    SliceValue slice => $"[{string.Join(", ", slice.Elements.Select(e => ConvertElementToString(e)))}]", // Manejar SliceValue                    RuneValue r => $"'{(char)r.Value}'",
+                    VoidValue _ => "void",
+                    _ => throw new SemanticError($"Unsupported type in fmt.Println: {value.GetType().Name}", context.Start)
+                };
+
+                output += " "; // Agregar un espacio entre los argumentos
+            }
         }
+
+        // Acumular el resultado en la propiedad `output` para el frontend
+        this.output += output.TrimEnd() + "\n";
+
+        return defaultValue;
     }
 
-    // Acumular el resultado en la propiedad `output` para el frontend
-    this.output += output.TrimEnd() + "\n";
-
-    return defaultValue;
-}
+    // Método auxiliar para convertir elementos del slice a cadenas
+    private string ConvertElementToString(ValueWrapper element)
+    {
+        return element switch
+        {
+            IntValue i => i.Value.ToString(),
+            FloatValue f => f.Value.ToString(CultureInfo.InvariantCulture),
+            StringValue s => s.Value,
+            BoolValue b => b.Value.ToString(),
+            RuneValue r => $"'{(char)r.Value}'",
+            _ => throw new SemanticError($"Unsupported type in slice: {element.GetType().Name}", null)
+        };
+    }
 
         //SwitchStmt CaseStatement DefaultCaseStmt
 
@@ -908,6 +935,77 @@ public override ValueWrapper VisitRune(LanguageParser.RuneContext context)
         throw new SemanticError("Invalid increment/decrement target", context.Start);
     }
     }
+
+    public override ValueWrapper VisitSliceInit(LanguageParser.SliceInitContext context)
+    {
+        var type = context.type().GetText(); // Obtener el tipo del slice
+        var elements = new List<ValueWrapper>();
+
+        // Evaluar cada expresión en la inicialización
+        foreach (var expr in context.expr())
+        {
+            var value = Visit(expr);
+            elements.Add(value);
+
+            // Verificar que el tipo del elemento coincida con el tipo del slice
+            if (!IsTypeCompatible(type, value))
+            {
+                throw new SemanticError($"All elements in the slice must be of the same type: expected '{type}', but found '{value.GetType().Name}'", context.Start);
+            }
+        }
+
+        return new SliceValue(type, elements);
+    }
+
+    public override ValueWrapper VisitSliceAccess(LanguageParser.SliceAccessContext context)
+    {
+        var slice = Visit(context.expr(0)); // Obtener el slice
+        var index = Visit(context.expr(1)); // Obtener el índice
+
+        if (slice is not SliceValue sliceValue)
+        {
+            throw new SemanticError("The variable is not a slice", context.Start);
+        }
+
+        if (index is not IntValue intIndex)
+        {
+            throw new SemanticError("The index must be an integer", context.Start);
+        }
+
+        if (intIndex.Value < 0 || intIndex.Value >= sliceValue.Elements.Count)
+        {
+            throw new SemanticError("Index out of bounds", context.Start);
+        }
+
+        return sliceValue.Elements[intIndex.Value];
+    }
+
+    public override ValueWrapper VisitSliceRange(LanguageParser.SliceRangeContext context)
+    {
+        var slice = Visit(context.expr(0)); // Obtener el slice
+        var startIndex = Visit(context.expr(1)); // Índice inicial
+        var endIndex = Visit(context.expr(2)); // Índice final
+
+        if (slice is not SliceValue sliceValue)
+        {
+            throw new SemanticError("The variable is not a slice", context.Start);
+        }
+
+        if (startIndex is not IntValue start || endIndex is not IntValue end)
+        {
+            throw new SemanticError("The indices must be integers", context.Start);
+        }
+
+        if (start.Value < 0 || end.Value > sliceValue.Elements.Count || start.Value > end.Value)
+        {
+            throw new SemanticError("Invalid slice range", context.Start);
+        }
+
+        var subSlice = sliceValue.Elements.GetRange(start.Value, end.Value - start.Value);
+        return new SliceValue(sliceValue.Type, subSlice);
+    }
+
+    
 
     
 }
