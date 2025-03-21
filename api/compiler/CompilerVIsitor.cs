@@ -1178,11 +1178,7 @@ public override ValueWrapper VisitRune(LanguageParser.RuneContext context)
                     currentRow.Add(value);
                 }
                 
-                // Verificar que todas las filas tengan el mismo tamaño
-                if (rows.Count > 0 && rows[0].Count != currentRow.Count)
-                {
-                    throw new SemanticError("All rows in matrix must have the same length", rowExpr.Start);
-                }
+                
                 
                 rows.Add(currentRow);
             }
@@ -1271,6 +1267,25 @@ public override ValueWrapper VisitRune(LanguageParser.RuneContext context)
         {
             throw new SemanticError($"strconv.ParseFloat: invalid float format in \"{strNumber}\"", context.Start);
         }
+    }
+
+    public override ValueWrapper VisitTypeOfCall(LanguageParser.TypeOfCallContext context)
+    {
+        var value = Visit(context.expr());
+        string type = value switch
+        {
+            IntValue => "int",
+            FloatValue => "float64",
+            BoolValue => "bool",
+            StringValue => "string",
+            SliceValue slice => $"[]" + slice.Type,
+            MultiDimSliceValue matrix => $"[][]" + matrix.Type,
+            VoidValue => "void",
+            _ => value.GetType().Name.Replace("Value", "")
+        };
+        
+        // Devolver el tipo como un string
+        return new StringValue(type);
     }
 
 }

@@ -301,6 +301,13 @@ public interface ILanguageVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitIdentifier([NotNull] LanguageParser.IdentifierContext context);
 	/// <summary>
+	/// Visit a parse tree produced by the <c>TypeOfCall</c>
+	/// labeled alternative in <see cref="LanguageParser.expr"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitTypeOfCall([NotNull] LanguageParser.TypeOfCallContext context);
+	/// <summary>
 	/// Visit a parse tree produced by the <c>Equality</c>
 	/// labeled alternative in <see cref="LanguageParser.expr"/>.
 	/// </summary>
