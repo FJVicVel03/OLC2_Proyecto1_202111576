@@ -58,6 +58,7 @@ expr:
 	| '[]' type '{' expr (',' expr)* '}' #SliceInit
 	| expr '[' expr ']' #SliceAccess
 	| expr '[' expr ':' expr ']' #SliceRange
+	| 'slices.Index' '(' expr ',' expr ')' #SliceIndexCall
 	| BOOL							# Boolean
 	| FLOAT						# Float
 	| STRING						# String

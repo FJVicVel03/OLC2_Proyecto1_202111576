@@ -1005,7 +1005,28 @@ public override ValueWrapper VisitRune(LanguageParser.RuneContext context)
         return new SliceValue(sliceValue.Type, subSlice);
     }
 
-    
+    public override ValueWrapper VisitSliceIndexCall(LanguageParser.SliceIndexCallContext context)
+    {
+        // Obtener los argumentos de la función
+        var slice = Visit(context.expr(0));
+        var searchValue = Visit(context.expr(1));
 
+        // Verificar que el primer argumento sea un slice
+        if (slice is not SliceValue sliceValue)
+        {
+            throw new SemanticError("The first argument to slices.Index must be a slice", context.Start);
+        }
+
+        // Buscar el valor en el slice
+        for (int i = 0; i < sliceValue.Elements.Count; i++)
+        {
+            if (sliceValue.Elements[i].Equals(searchValue))
+            {
+                return new IntValue(i); // Retorna el índice de la primera coincidencia
+            }
+        }
+
+        return new IntValue(-1); // Retorna -1 si no se encuentra
+    }
     
 }

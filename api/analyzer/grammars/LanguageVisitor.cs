@@ -210,6 +210,13 @@ public interface ILanguageVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitCallee([NotNull] LanguageParser.CalleeContext context);
 	/// <summary>
+	/// Visit a parse tree produced by the <c>SliceIndexCall</c>
+	/// labeled alternative in <see cref="LanguageParser.expr"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitSliceIndexCall([NotNull] LanguageParser.SliceIndexCallContext context);
+	/// <summary>
 	/// Visit a parse tree produced by the <c>New</c>
 	/// labeled alternative in <see cref="LanguageParser.expr"/>.
 	/// </summary>
