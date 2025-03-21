@@ -1059,5 +1059,20 @@ public override ValueWrapper VisitRune(LanguageParser.RuneContext context)
 
         return new StringValue(joinedString);
     }
+
+    public override ValueWrapper VisitLenCall(LanguageParser.LenCallContext context)
+    {
+        // Obtener el argumento de la función
+        var slice = Visit(context.expr());
+
+        // Verificar que el argumento sea un slice
+        if (slice is not SliceValue sliceValue)
+        {
+            throw new SemanticError("The argument to len must be a slice", context.Start);
+        }
+
+        // Retornar la cantidad de elementos en el slice
+        return new IntValue(sliceValue.Elements.Count);
+    }
     
 }

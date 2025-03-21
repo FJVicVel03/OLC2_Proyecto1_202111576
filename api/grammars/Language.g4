@@ -60,6 +60,7 @@ expr:
 	| expr '[' expr ':' expr ']' #SliceRange
 	| 'slices.Index' '(' expr ',' expr ')' #SliceIndexCall
 	| 'strings.Join' '(' expr ',' expr ')' #StringsJoinCall
+	| 'len' '(' expr ')' #LenCall
 	| BOOL							# Boolean
 	| FLOAT						# Float
 	| STRING						# String
