@@ -28,13 +28,13 @@ expr ';' # ExprStmt
 | 'while' '(' expr ')' stmt # WhileStmt
 | 'for' expr '{' stmt* '}' # ForConditionStmt // Variante condicional
 | 'for'  forInit expr ';' expr  stmt # ForStmt
-| 'do' stmt 'while' '(' expr ')' ';' # DoWhileStmt
+| 'do' stmt 'while' '(' expr ')'  # DoWhileStmt
 | 'switch'  expr  '{' switchCase* '}' # SwitchStmt
-| 'case' expr ':' stmt # CaseStatement
-| 'default' ':' stmt # DefaultCaseStmt
-| 'break' ';' # BreakStmt
-| 'continue' ';' # ContinueStmt
-| 'return' expr? ';' # ReturnStmt;
+| 'case' expr  stmt # CaseStatement
+| 'default'  stmt # DefaultCaseStmt
+| 'break'  # BreakStmt
+| 'continue'  # ContinueStmt
+| 'return' expr?  # ReturnStmt;
 
 switchCase: caseStmt | defaultStmt;
 
