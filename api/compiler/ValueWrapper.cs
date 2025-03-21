@@ -31,5 +31,45 @@ public record SliceValue(string Type, List<ValueWrapper> Elements) : ValueWrappe
     }
 }
 
+public record MultiSliceValue(string Type, List<List<ValueWrapper>> Elements) : ValueWrapper
+{
+    public override string ToString()
+    {
+        return "[" + string.Join(", ", Elements) + "]";
+    }
+    
+    public int GetRowCount()
+    {
+        return Elements.Count;
+    }
+
+    public int GetColumnCount(int rowIndex)
+    {
+        if (rowIndex < 0 || rowIndex >= GetRowCount())
+        {
+            throw new ArgumentOutOfRangeException(nameof(rowIndex), "Row index out of bounds");
+        }
+        return Elements[rowIndex].Count;
+    }
+}
+
+public record MultiDimSliceValue(string Type, List<List<ValueWrapper>> Elements) : ValueWrapper
+{
+    public ValueWrapper GetValue(int row, int col)
+    {
+        if (row < 0 || row >= Elements.Count)
+        {
+            throw new IndexOutOfRangeException("Row index out of bounds");
+        }
+        if (col < 0 || col >= Elements[row].Count)
+        {
+            throw new IndexOutOfRangeException("Column index out of bounds");
+        }
+        return Elements[row][col];
+    }
+}
+
 public record VoidValue : ValueWrapper;
+
+
 

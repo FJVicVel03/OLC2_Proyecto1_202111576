@@ -397,6 +397,51 @@ public override ValueWrapper VisitRune(LanguageParser.RuneContext context)
         }
         return defaultValue;
     }
+    else if (asignee is LanguageParser.MultiDimSliceAccessContext multiDimAccess)
+        {
+            var slice = Visit(multiDimAccess.expr(0));
+            var rowIndex = Visit(multiDimAccess.expr(1));
+            var colIndex = Visit(multiDimAccess.expr(2));
+
+            if (slice is not SliceValue sliceValue)
+            {
+                throw new SemanticError("The target is not a multidimensional slice", context.Start);
+            }
+
+            if (rowIndex is not IntValue rowInt || colIndex is not IntValue colInt)
+            {
+                throw new SemanticError("The indices must be integers", context.Start);
+            }
+
+            // Verificar que el índice de la fila esté dentro del rango
+            if (rowInt.Value < 0 || rowInt.Value >= sliceValue.Elements.Count)
+            {
+                throw new SemanticError("Row index out of bounds", context.Start);
+            }
+
+            var row = sliceValue.Elements[rowInt.Value];
+
+            if (row is not SliceValue rowSlice)
+            {
+                throw new SemanticError("The row is not a slice", context.Start);
+            }
+
+            // Verificar que el índice de la columna esté dentro del rango
+            if (colInt.Value < 0 || colInt.Value >= rowSlice.Elements.Count)
+            {
+                throw new SemanticError("Column index out of bounds", context.Start);
+            }
+
+            // Verificar que el tipo del valor sea compatible con el tipo del slice
+            if (!IsTypeCompatible(rowSlice.Type, value))
+            {
+                throw new SemanticError($"Cannot assign value of type '{value.GetType().Name}' to slice of type '{rowSlice.Type}'", context.Start);
+            }
+
+            // Asignar el nuevo valor
+            rowSlice.Elements[colInt.Value] = value;
+            return defaultValue;
+        }
     else
     {
         throw new SemanticError("Invalid assignment target", context.Start);
@@ -791,7 +836,8 @@ public override ValueWrapper VisitRune(LanguageParser.RuneContext context)
                     FloatValue f => f.Value.ToString(CultureInfo.InvariantCulture),
                     StringValue s => s.Value,
                     BoolValue b => b.Value.ToString(),
-                    SliceValue slice => $"[{string.Join(", ", slice.Elements.Select(e => ConvertElementToString(e)))}]", // Manejar SliceValue                    RuneValue r => $"'{(char)r.Value}'",
+                    SliceValue slice => $"[{string.Join(", ", slice.Elements.Select(e => ConvertElementToString(e)))}]", // Manejar SliceValue
+                    MultiSliceValue multiSlice => $"[{string.Join(", ", multiSlice.Elements.Select(e => $"[{string.Join(", ", e.Select(e => ConvertElementToString(e)))}]"))}]", // Manejar MultiSliceValue
                     VoidValue _ => "void",
                     _ => throw new SemanticError($"Unsupported type in fmt.Println: {value.GetType().Name}", context.Start)
                 };
@@ -1106,5 +1152,67 @@ public override ValueWrapper VisitRune(LanguageParser.RuneContext context)
         // Retornar un nuevo slice con los elementos añadidos
         return new SliceValue(sliceValue.Type, newElements);
     }
-    
+            
+        public override ValueWrapper VisitMultiDimSliceInit(LanguageParser.MultiDimSliceInitContext context)
+        {
+            Console.WriteLine("Entering MultiDimSliceInit");
+            var type = context.type().GetText();
+            var rows = new List<List<ValueWrapper>>();
+
+            foreach (var rowExpr in context.matrixRow())
+            {
+                Console.WriteLine($"Processing row: {rowExpr.GetText()}");
+                var currentRow = new List<ValueWrapper>();
+
+                // Procesar cada elemento de la fila
+                foreach (var element in rowExpr.expr())
+                {
+                    var value = Visit(element);
+                    
+                    // Verificar que el tipo del elemento coincida
+                    if (!IsTypeCompatible(type, value))
+                    {
+                        throw new SemanticError($"Type mismatch in matrix: Expected {type}, got {value.GetType().Name}", element.Start);
+                    }
+                    
+                    currentRow.Add(value);
+                }
+                
+                // Verificar que todas las filas tengan el mismo tamaño
+                if (rows.Count > 0 && rows[0].Count != currentRow.Count)
+                {
+                    throw new SemanticError("All rows in matrix must have the same length", rowExpr.Start);
+                }
+                
+                rows.Add(currentRow);
+            }
+
+            if (rows.Count == 0)
+            {
+                throw new SemanticError("Matrix cannot be empty", context.Start);
+            }
+
+            Console.WriteLine($"Created matrix with {rows.Count} rows");
+            return new MultiDimSliceValue(type, rows);
+        }
+
+    public override ValueWrapper VisitMultiDimSliceAccess(LanguageParser.MultiDimSliceAccessContext context)
+    {
+        var matrix = Visit(context.expr(0));
+        var row = Visit(context.expr(1));
+        var col = Visit(context.expr(2));
+
+        if (matrix is not MultiDimSliceValue matrixValue)
+        {
+            throw new SemanticError("Expected a matrix", context.Start);
+        }
+
+        if (row is not IntValue rowIndex || col is not IntValue colIndex)
+        {
+            throw new SemanticError("Matrix indices must be integers", context.Start);
+        }
+
+        return matrixValue.GetValue(rowIndex.Value, colIndex.Value);
+    }
+
 }

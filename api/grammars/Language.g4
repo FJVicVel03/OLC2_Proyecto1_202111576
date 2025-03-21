@@ -56,6 +56,8 @@ expr:
 	| expr ('='| ':=') expr			# Assign
 	| expr ('++' | '--')			# IncDec
 	| '[]' type '{' expr (',' expr)* '}' #SliceInit
+	| '[][]' type '{' matrixRow (',' matrixRow)* '}' # MultiDimSliceInit
+	| expr '[' expr ']' '[' expr ']' # MultiDimSliceAccess
 	| expr '[' expr ']' #SliceAccess
 	| expr '[' expr ':' expr ']' #SliceRange
 	| 'slices.Index' '(' expr ',' expr ')' #SliceIndexCall
@@ -73,6 +75,7 @@ expr:
 	
 call: '(' args? ')' # FuncCall | '.' ID # Get; 
 args: expr (',' expr)*;	
+matrixRow: '{' expr (',' expr)* '}';
 
 INT: [0-9]+;
 BOOL: 'true' | 'false';

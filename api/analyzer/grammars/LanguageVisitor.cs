@@ -224,6 +224,13 @@ public interface ILanguageVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitNew([NotNull] LanguageParser.NewContext context);
 	/// <summary>
+	/// Visit a parse tree produced by the <c>MultiDimSliceInit</c>
+	/// labeled alternative in <see cref="LanguageParser.expr"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitMultiDimSliceInit([NotNull] LanguageParser.MultiDimSliceInitContext context);
+	/// <summary>
 	/// Visit a parse tree produced by the <c>MulDiv</c>
 	/// labeled alternative in <see cref="LanguageParser.expr"/>.
 	/// </summary>
@@ -244,6 +251,13 @@ public interface ILanguageVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitStringsJoinCall([NotNull] LanguageParser.StringsJoinCallContext context);
+	/// <summary>
+	/// Visit a parse tree produced by the <c>MultiDimSliceAccess</c>
+	/// labeled alternative in <see cref="LanguageParser.expr"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitMultiDimSliceAccess([NotNull] LanguageParser.MultiDimSliceAccessContext context);
 	/// <summary>
 	/// Visit a parse tree produced by the <c>Logical</c>
 	/// labeled alternative in <see cref="LanguageParser.expr"/>.
@@ -404,5 +418,11 @@ public interface ILanguageVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitArgs([NotNull] LanguageParser.ArgsContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="LanguageParser.matrixRow"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitMatrixRow([NotNull] LanguageParser.MatrixRowContext context);
 }
 } // namespace analyzer

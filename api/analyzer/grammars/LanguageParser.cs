@@ -44,17 +44,18 @@ public partial class LanguageParser : Parser {
 		T__31=32, T__32=33, T__33=34, T__34=35, T__35=36, T__36=37, T__37=38, 
 		T__38=39, T__39=40, T__40=41, T__41=42, T__42=43, T__43=44, T__44=45, 
 		T__45=46, T__46=47, T__47=48, T__48=49, T__49=50, T__50=51, T__51=52, 
-		T__52=53, T__53=54, T__54=55, T__55=56, T__56=57, INT=58, BOOL=59, FLOAT=60, 
-		STRING=61, RUNE=62, WS=63, ID=64, COMMENT=65, ML_COMMENT=66, ESC_SEQ=67;
+		T__52=53, T__53=54, T__54=55, T__55=56, T__56=57, T__57=58, INT=59, BOOL=60, 
+		FLOAT=61, STRING=62, RUNE=63, WS=64, ID=65, COMMENT=66, ML_COMMENT=67, 
+		ESC_SEQ=68;
 	public const int
 		RULE_program = 0, RULE_dcl = 1, RULE_varDcl = 2, RULE_type = 3, RULE_funcDcl = 4, 
 		RULE_classDcl = 5, RULE_classBody = 6, RULE_params = 7, RULE_stmt = 8, 
 		RULE_switchCase = 9, RULE_caseStmt = 10, RULE_defaultStmt = 11, RULE_forInit = 12, 
-		RULE_expr = 13, RULE_call = 14, RULE_args = 15;
+		RULE_expr = 13, RULE_call = 14, RULE_args = 15, RULE_matrixRow = 16;
 	public static readonly string[] ruleNames = {
 		"program", "dcl", "varDcl", "type", "funcDcl", "classDcl", "classBody", 
 		"params", "stmt", "switchCase", "caseStmt", "defaultStmt", "forInit", 
-		"expr", "call", "args"
+		"expr", "call", "args", "matrixRow"
 	};
 
 	private static readonly string[] _LiteralNames = {
@@ -64,7 +65,7 @@ public partial class LanguageParser : Parser {
 		"'switch'", "'case'", "'default'", "'break'", "'continue'", "'return'", 
 		"'-'", "'!'", "'*'", "'/'", "'%'", "'+'", "'>'", "'<'", "'>='", "'<='", 
 		"'=='", "'!='", "'+='", "'-='", "'&&'", "'||'", "'++'", "'--'", "'[]'", 
-		"'['", "']'", "'slices.Index'", "'strings.Join'", "'len'", "'append'", 
+		"'[][]'", "'['", "']'", "'slices.Index'", "'strings.Join'", "'len'", "'append'", 
 		"'new'", "'.'"
 	};
 	private static readonly string[] _SymbolicNames = {
@@ -72,8 +73,9 @@ public partial class LanguageParser : Parser {
 		null, null, null, null, null, null, null, null, null, null, null, null, 
 		null, null, null, null, null, null, null, null, null, null, null, null, 
 		null, null, null, null, null, null, null, null, null, null, null, null, 
-		null, null, null, null, null, null, null, null, null, null, "INT", "BOOL", 
-		"FLOAT", "STRING", "RUNE", "WS", "ID", "COMMENT", "ML_COMMENT", "ESC_SEQ"
+		null, null, null, null, null, null, null, null, null, null, null, "INT", 
+		"BOOL", "FLOAT", "STRING", "RUNE", "WS", "ID", "COMMENT", "ML_COMMENT", 
+		"ESC_SEQ"
 	};
 	public static readonly IVocabulary DefaultVocabulary = new Vocabulary(_LiteralNames, _SymbolicNames);
 
@@ -135,17 +137,17 @@ public partial class LanguageParser : Parser {
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 35;
+			State = 37;
 			ErrorHandler.Sync(this);
 			_la = TokenStream.LA(1);
-			while (((((_la - 1)) & ~0x3f) == 0 && ((1L << (_la - 1)) & -4685713933009005055L) != 0)) {
+			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & -295548716959618046L) != 0) || _la==ID) {
 				{
 				{
-				State = 32;
+				State = 34;
 				dcl();
 				}
 				}
-				State = 37;
+				State = 39;
 				ErrorHandler.Sync(this);
 				_la = TokenStream.LA(1);
 			}
@@ -196,41 +198,41 @@ public partial class LanguageParser : Parser {
 		DclContext _localctx = new DclContext(Context, State);
 		EnterRule(_localctx, 2, RULE_dcl);
 		try {
-			State = 43;
+			State = 45;
 			ErrorHandler.Sync(this);
 			switch ( Interpreter.AdaptivePredict(TokenStream,1,Context) ) {
 			case 1:
 				EnterOuterAlt(_localctx, 1);
 				{
-				State = 38;
+				State = 40;
 				varDcl();
 				}
 				break;
 			case 2:
 				EnterOuterAlt(_localctx, 2);
 				{
-				State = 39;
+				State = 41;
 				stmt();
 				}
 				break;
 			case 3:
 				EnterOuterAlt(_localctx, 3);
 				{
-				State = 40;
+				State = 42;
 				funcDcl();
 				}
 				break;
 			case 4:
 				EnterOuterAlt(_localctx, 4);
 				{
-				State = 41;
+				State = 43;
 				classDcl();
 				}
 				break;
 			case 5:
 				EnterOuterAlt(_localctx, 5);
 				{
-				State = 42;
+				State = 44;
 				expr(0);
 				}
 				break;
@@ -274,28 +276,28 @@ public partial class LanguageParser : Parser {
 		EnterRule(_localctx, 4, RULE_varDcl);
 		int _la;
 		try {
-			State = 60;
+			State = 62;
 			ErrorHandler.Sync(this);
 			switch ( Interpreter.AdaptivePredict(TokenStream,3,Context) ) {
 			case 1:
 				EnterOuterAlt(_localctx, 1);
 				{
-				State = 45;
-				Match(T__0);
-				State = 46;
-				Match(ID);
 				State = 47;
-				Match(T__1);
+				Match(T__0);
 				State = 48;
+				Match(ID);
+				State = 49;
+				Match(T__1);
+				State = 50;
 				type();
-				State = 51;
+				State = 53;
 				ErrorHandler.Sync(this);
 				_la = TokenStream.LA(1);
 				if (_la==T__2) {
 					{
-					State = 49;
+					State = 51;
 					Match(T__2);
-					State = 50;
+					State = 52;
 					expr(0);
 					}
 				}
@@ -305,24 +307,24 @@ public partial class LanguageParser : Parser {
 			case 2:
 				EnterOuterAlt(_localctx, 2);
 				{
-				State = 53;
-				Match(T__0);
-				State = 54;
-				Match(ID);
 				State = 55;
-				Match(T__2);
+				Match(T__0);
 				State = 56;
+				Match(ID);
+				State = 57;
+				Match(T__2);
+				State = 58;
 				expr(0);
 				}
 				break;
 			case 3:
 				EnterOuterAlt(_localctx, 3);
 				{
-				State = 57;
-				Match(ID);
-				State = 58;
-				Match(T__3);
 				State = 59;
+				Match(ID);
+				State = 60;
+				Match(T__3);
+				State = 61;
 				expr(0);
 				}
 				break;
@@ -361,7 +363,7 @@ public partial class LanguageParser : Parser {
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 62;
+			State = 64;
 			_la = TokenStream.LA(1);
 			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & 992L) != 0)) ) {
 			ErrorHandler.RecoverInline(this);
@@ -415,41 +417,41 @@ public partial class LanguageParser : Parser {
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 64;
-			Match(T__9);
-			State = 65;
-			Match(ID);
 			State = 66;
-			Match(T__10);
+			Match(T__9);
+			State = 67;
+			Match(ID);
 			State = 68;
+			Match(T__10);
+			State = 70;
 			ErrorHandler.Sync(this);
 			_la = TokenStream.LA(1);
 			if (_la==T__0 || _la==ID) {
 				{
-				State = 67;
+				State = 69;
 				@params();
 				}
 			}
 
-			State = 70;
+			State = 72;
 			Match(T__11);
-			State = 71;
+			State = 73;
 			Match(T__12);
-			State = 75;
+			State = 77;
 			ErrorHandler.Sync(this);
 			_la = TokenStream.LA(1);
-			while (((((_la - 1)) & ~0x3f) == 0 && ((1L << (_la - 1)) & -4685713933009005055L) != 0)) {
+			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & -295548716959618046L) != 0) || _la==ID) {
 				{
 				{
-				State = 72;
+				State = 74;
 				dcl();
 				}
 				}
-				State = 77;
+				State = 79;
 				ErrorHandler.Sync(this);
 				_la = TokenStream.LA(1);
 			}
-			State = 78;
+			State = 80;
 			Match(T__13);
 			}
 		}
@@ -493,27 +495,27 @@ public partial class LanguageParser : Parser {
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 80;
-			Match(T__14);
-			State = 81;
-			Match(ID);
 			State = 82;
+			Match(T__14);
+			State = 83;
+			Match(ID);
+			State = 84;
 			Match(T__12);
-			State = 86;
+			State = 88;
 			ErrorHandler.Sync(this);
 			_la = TokenStream.LA(1);
-			while (((((_la - 1)) & ~0x3f) == 0 && ((1L << (_la - 1)) & -9223372036854775295L) != 0)) {
+			while (_la==T__0 || _la==T__9 || _la==ID) {
 				{
 				{
-				State = 83;
+				State = 85;
 				classBody();
 				}
 				}
-				State = 88;
+				State = 90;
 				ErrorHandler.Sync(this);
 				_la = TokenStream.LA(1);
 			}
-			State = 89;
+			State = 91;
 			Match(T__13);
 			}
 		}
@@ -553,21 +555,21 @@ public partial class LanguageParser : Parser {
 		ClassBodyContext _localctx = new ClassBodyContext(Context, State);
 		EnterRule(_localctx, 12, RULE_classBody);
 		try {
-			State = 93;
+			State = 95;
 			ErrorHandler.Sync(this);
 			switch (TokenStream.LA(1)) {
 			case T__0:
 			case ID:
 				EnterOuterAlt(_localctx, 1);
 				{
-				State = 91;
+				State = 93;
 				varDcl();
 				}
 				break;
 			case T__9:
 				EnterOuterAlt(_localctx, 2);
 				{
-				State = 92;
+				State = 94;
 				funcDcl();
 				}
 				break;
@@ -616,27 +618,27 @@ public partial class LanguageParser : Parser {
 		EnterRule(_localctx, 14, RULE_params);
 		int _la;
 		try {
-			State = 117;
+			State = 119;
 			ErrorHandler.Sync(this);
 			switch (TokenStream.LA(1)) {
 			case ID:
 				EnterOuterAlt(_localctx, 1);
 				{
-				State = 95;
+				State = 97;
 				Match(ID);
-				State = 100;
+				State = 102;
 				ErrorHandler.Sync(this);
 				_la = TokenStream.LA(1);
 				while (_la==T__15) {
 					{
 					{
-					State = 96;
+					State = 98;
 					Match(T__15);
-					State = 97;
+					State = 99;
 					Match(ID);
 					}
 					}
-					State = 102;
+					State = 104;
 					ErrorHandler.Sync(this);
 					_la = TokenStream.LA(1);
 				}
@@ -645,33 +647,33 @@ public partial class LanguageParser : Parser {
 			case T__0:
 				EnterOuterAlt(_localctx, 2);
 				{
-				State = 103;
-				Match(T__0);
-				State = 104;
-				Match(ID);
 				State = 105;
-				Match(T__1);
+				Match(T__0);
 				State = 106;
+				Match(ID);
+				State = 107;
+				Match(T__1);
+				State = 108;
 				type();
-				State = 114;
+				State = 116;
 				ErrorHandler.Sync(this);
 				_la = TokenStream.LA(1);
 				while (_la==T__15) {
 					{
 					{
-					State = 107;
-					Match(T__15);
-					State = 108;
-					Match(T__0);
 					State = 109;
-					Match(ID);
+					Match(T__15);
 					State = 110;
-					Match(T__1);
+					Match(T__0);
 					State = 111;
+					Match(ID);
+					State = 112;
+					Match(T__1);
+					State = 113;
 					type();
 					}
 					}
-					State = 116;
+					State = 118;
 					ErrorHandler.Sync(this);
 					_la = TokenStream.LA(1);
 				}
@@ -916,16 +918,16 @@ public partial class LanguageParser : Parser {
 		int _la;
 		try {
 			int _alt;
-			State = 205;
+			State = 207;
 			ErrorHandler.Sync(this);
 			switch ( Interpreter.AdaptivePredict(TokenStream,18,Context) ) {
 			case 1:
 				_localctx = new ExprStmtContext(_localctx);
 				EnterOuterAlt(_localctx, 1);
 				{
-				State = 119;
+				State = 121;
 				expr(0);
-				State = 120;
+				State = 122;
 				Match(T__16);
 				}
 				break;
@@ -933,19 +935,19 @@ public partial class LanguageParser : Parser {
 				_localctx = new PrintStmtContext(_localctx);
 				EnterOuterAlt(_localctx, 2);
 				{
-				State = 122;
-				Match(T__17);
 				State = 124;
+				Match(T__17);
+				State = 126;
 				ErrorHandler.Sync(this);
 				_la = TokenStream.LA(1);
-				if (((((_la - 11)) & ~0x3f) == 0 && ((1L << (_la - 11)) & 13438505995730945L) != 0)) {
+				if (((((_la - 11)) & ~0x3f) == 0 && ((1L << (_la - 11)) & 26877286866223105L) != 0)) {
 					{
-					State = 123;
+					State = 125;
 					args();
 					}
 				}
 
-				State = 126;
+				State = 128;
 				Match(T__11);
 				}
 				break;
@@ -953,23 +955,23 @@ public partial class LanguageParser : Parser {
 				_localctx = new BlockStmtContext(_localctx);
 				EnterOuterAlt(_localctx, 3);
 				{
-				State = 127;
+				State = 129;
 				Match(T__12);
-				State = 131;
+				State = 133;
 				ErrorHandler.Sync(this);
 				_la = TokenStream.LA(1);
-				while (((((_la - 1)) & ~0x3f) == 0 && ((1L << (_la - 1)) & -4685713933009005055L) != 0)) {
+				while ((((_la) & ~0x3f) == 0 && ((1L << _la) & -295548716959618046L) != 0) || _la==ID) {
 					{
 					{
-					State = 128;
+					State = 130;
 					dcl();
 					}
 					}
-					State = 133;
+					State = 135;
 					ErrorHandler.Sync(this);
 					_la = TokenStream.LA(1);
 				}
-				State = 134;
+				State = 136;
 				Match(T__13);
 				}
 				break;
@@ -977,40 +979,40 @@ public partial class LanguageParser : Parser {
 				_localctx = new IfStmtContext(_localctx);
 				EnterOuterAlt(_localctx, 4);
 				{
-				State = 135;
-				Match(T__18);
-				State = 136;
-				expr(0);
 				State = 137;
+				Match(T__18);
+				State = 138;
+				expr(0);
+				State = 139;
 				stmt();
-				State = 144;
+				State = 146;
 				ErrorHandler.Sync(this);
 				_alt = Interpreter.AdaptivePredict(TokenStream,13,Context);
 				while ( _alt!=2 && _alt!=global::Antlr4.Runtime.Atn.ATN.INVALID_ALT_NUMBER ) {
 					if ( _alt==1 ) {
 						{
 						{
-						State = 138;
-						Match(T__19);
-						State = 139;
-						expr(0);
 						State = 140;
+						Match(T__19);
+						State = 141;
+						expr(0);
+						State = 142;
 						stmt();
 						}
 						} 
 					}
-					State = 146;
+					State = 148;
 					ErrorHandler.Sync(this);
 					_alt = Interpreter.AdaptivePredict(TokenStream,13,Context);
 				}
-				State = 149;
+				State = 151;
 				ErrorHandler.Sync(this);
 				switch ( Interpreter.AdaptivePredict(TokenStream,14,Context) ) {
 				case 1:
 					{
-					State = 147;
+					State = 149;
 					Match(T__20);
-					State = 148;
+					State = 150;
 					stmt();
 					}
 					break;
@@ -1021,15 +1023,15 @@ public partial class LanguageParser : Parser {
 				_localctx = new WhileStmtContext(_localctx);
 				EnterOuterAlt(_localctx, 5);
 				{
-				State = 151;
-				Match(T__21);
-				State = 152;
-				Match(T__10);
 				State = 153;
-				expr(0);
+				Match(T__21);
 				State = 154;
-				Match(T__11);
+				Match(T__10);
 				State = 155;
+				expr(0);
+				State = 156;
+				Match(T__11);
+				State = 157;
 				stmt();
 				}
 				break;
@@ -1037,27 +1039,27 @@ public partial class LanguageParser : Parser {
 				_localctx = new ForConditionStmtContext(_localctx);
 				EnterOuterAlt(_localctx, 6);
 				{
-				State = 157;
-				Match(T__22);
-				State = 158;
-				expr(0);
 				State = 159;
+				Match(T__22);
+				State = 160;
+				expr(0);
+				State = 161;
 				Match(T__12);
-				State = 163;
+				State = 165;
 				ErrorHandler.Sync(this);
 				_la = TokenStream.LA(1);
-				while (((((_la - 11)) & ~0x3f) == 0 && ((1L << (_la - 11)) & 13438505996777861L) != 0)) {
+				while (((((_la - 11)) & ~0x3f) == 0 && ((1L << (_la - 11)) & 26877286867270021L) != 0)) {
 					{
 					{
-					State = 160;
+					State = 162;
 					stmt();
 					}
 					}
-					State = 165;
+					State = 167;
 					ErrorHandler.Sync(this);
 					_la = TokenStream.LA(1);
 				}
-				State = 166;
+				State = 168;
 				Match(T__13);
 				}
 				break;
@@ -1065,17 +1067,17 @@ public partial class LanguageParser : Parser {
 				_localctx = new ForStmtContext(_localctx);
 				EnterOuterAlt(_localctx, 7);
 				{
-				State = 168;
-				Match(T__22);
-				State = 169;
-				forInit();
 				State = 170;
-				expr(0);
+				Match(T__22);
 				State = 171;
-				Match(T__16);
+				forInit();
 				State = 172;
 				expr(0);
 				State = 173;
+				Match(T__16);
+				State = 174;
+				expr(0);
+				State = 175;
 				stmt();
 				}
 				break;
@@ -1083,17 +1085,17 @@ public partial class LanguageParser : Parser {
 				_localctx = new DoWhileStmtContext(_localctx);
 				EnterOuterAlt(_localctx, 8);
 				{
-				State = 175;
-				Match(T__23);
-				State = 176;
-				stmt();
 				State = 177;
-				Match(T__21);
+				Match(T__23);
 				State = 178;
-				Match(T__10);
+				stmt();
 				State = 179;
-				expr(0);
+				Match(T__21);
 				State = 180;
+				Match(T__10);
+				State = 181;
+				expr(0);
+				State = 182;
 				Match(T__11);
 				}
 				break;
@@ -1101,27 +1103,27 @@ public partial class LanguageParser : Parser {
 				_localctx = new SwitchStmtContext(_localctx);
 				EnterOuterAlt(_localctx, 9);
 				{
-				State = 182;
-				Match(T__24);
-				State = 183;
-				expr(0);
 				State = 184;
+				Match(T__24);
+				State = 185;
+				expr(0);
+				State = 186;
 				Match(T__12);
-				State = 188;
+				State = 190;
 				ErrorHandler.Sync(this);
 				_la = TokenStream.LA(1);
 				while (_la==T__25 || _la==T__26) {
 					{
 					{
-					State = 185;
+					State = 187;
 					switchCase();
 					}
 					}
-					State = 190;
+					State = 192;
 					ErrorHandler.Sync(this);
 					_la = TokenStream.LA(1);
 				}
-				State = 191;
+				State = 193;
 				Match(T__13);
 				}
 				break;
@@ -1129,11 +1131,11 @@ public partial class LanguageParser : Parser {
 				_localctx = new CaseStatementContext(_localctx);
 				EnterOuterAlt(_localctx, 10);
 				{
-				State = 193;
-				Match(T__25);
-				State = 194;
-				expr(0);
 				State = 195;
+				Match(T__25);
+				State = 196;
+				expr(0);
+				State = 197;
 				stmt();
 				}
 				break;
@@ -1141,9 +1143,9 @@ public partial class LanguageParser : Parser {
 				_localctx = new DefaultCaseStmtContext(_localctx);
 				EnterOuterAlt(_localctx, 11);
 				{
-				State = 197;
+				State = 199;
 				Match(T__26);
-				State = 198;
+				State = 200;
 				stmt();
 				}
 				break;
@@ -1151,7 +1153,7 @@ public partial class LanguageParser : Parser {
 				_localctx = new BreakStmtContext(_localctx);
 				EnterOuterAlt(_localctx, 12);
 				{
-				State = 199;
+				State = 201;
 				Match(T__27);
 				}
 				break;
@@ -1159,7 +1161,7 @@ public partial class LanguageParser : Parser {
 				_localctx = new ContinueStmtContext(_localctx);
 				EnterOuterAlt(_localctx, 13);
 				{
-				State = 200;
+				State = 202;
 				Match(T__28);
 				}
 				break;
@@ -1167,14 +1169,14 @@ public partial class LanguageParser : Parser {
 				_localctx = new ReturnStmtContext(_localctx);
 				EnterOuterAlt(_localctx, 14);
 				{
-				State = 201;
-				Match(T__29);
 				State = 203;
+				Match(T__29);
+				State = 205;
 				ErrorHandler.Sync(this);
 				switch ( Interpreter.AdaptivePredict(TokenStream,17,Context) ) {
 				case 1:
 					{
-					State = 202;
+					State = 204;
 					expr(0);
 					}
 					break;
@@ -1219,20 +1221,20 @@ public partial class LanguageParser : Parser {
 		SwitchCaseContext _localctx = new SwitchCaseContext(Context, State);
 		EnterRule(_localctx, 18, RULE_switchCase);
 		try {
-			State = 209;
+			State = 211;
 			ErrorHandler.Sync(this);
 			switch (TokenStream.LA(1)) {
 			case T__25:
 				EnterOuterAlt(_localctx, 1);
 				{
-				State = 207;
+				State = 209;
 				caseStmt();
 				}
 				break;
 			case T__26:
 				EnterOuterAlt(_localctx, 2);
 				{
-				State = 208;
+				State = 210;
 				defaultStmt();
 				}
 				break;
@@ -1278,13 +1280,13 @@ public partial class LanguageParser : Parser {
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 211;
-			Match(T__25);
-			State = 212;
-			expr(0);
 			State = 213;
-			Match(T__1);
+			Match(T__25);
 			State = 214;
+			expr(0);
+			State = 215;
+			Match(T__1);
+			State = 216;
 			stmt();
 			}
 		}
@@ -1323,11 +1325,11 @@ public partial class LanguageParser : Parser {
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 216;
-			Match(T__26);
-			State = 217;
-			Match(T__1);
 			State = 218;
+			Match(T__26);
+			State = 219;
+			Match(T__1);
+			State = 220;
 			stmt();
 			}
 		}
@@ -1367,22 +1369,22 @@ public partial class LanguageParser : Parser {
 		ForInitContext _localctx = new ForInitContext(Context, State);
 		EnterRule(_localctx, 24, RULE_forInit);
 		try {
-			State = 224;
+			State = 226;
 			ErrorHandler.Sync(this);
 			switch ( Interpreter.AdaptivePredict(TokenStream,20,Context) ) {
 			case 1:
 				EnterOuterAlt(_localctx, 1);
 				{
-				State = 220;
+				State = 222;
 				varDcl();
 				}
 				break;
 			case 2:
 				EnterOuterAlt(_localctx, 2);
 				{
-				State = 221;
+				State = 223;
 				expr(0);
-				State = 222;
+				State = 224;
 				Match(T__16);
 				}
 				break;
@@ -1457,6 +1459,24 @@ public partial class LanguageParser : Parser {
 			else return visitor.VisitChildren(this);
 		}
 	}
+	public partial class MultiDimSliceInitContext : ExprContext {
+		[System.Diagnostics.DebuggerNonUserCode] public TypeContext type() {
+			return GetRuleContext<TypeContext>(0);
+		}
+		[System.Diagnostics.DebuggerNonUserCode] public MatrixRowContext[] matrixRow() {
+			return GetRuleContexts<MatrixRowContext>();
+		}
+		[System.Diagnostics.DebuggerNonUserCode] public MatrixRowContext matrixRow(int i) {
+			return GetRuleContext<MatrixRowContext>(i);
+		}
+		public MultiDimSliceInitContext(ExprContext context) { CopyFrom(context); }
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			ILanguageVisitor<TResult> typedVisitor = visitor as ILanguageVisitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitMultiDimSliceInit(this);
+			else return visitor.VisitChildren(this);
+		}
+	}
 	public partial class MulDivContext : ExprContext {
 		public IToken op;
 		[System.Diagnostics.DebuggerNonUserCode] public ExprContext[] expr() {
@@ -1497,6 +1517,21 @@ public partial class LanguageParser : Parser {
 		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
 			ILanguageVisitor<TResult> typedVisitor = visitor as ILanguageVisitor<TResult>;
 			if (typedVisitor != null) return typedVisitor.VisitStringsJoinCall(this);
+			else return visitor.VisitChildren(this);
+		}
+	}
+	public partial class MultiDimSliceAccessContext : ExprContext {
+		[System.Diagnostics.DebuggerNonUserCode] public ExprContext[] expr() {
+			return GetRuleContexts<ExprContext>();
+		}
+		[System.Diagnostics.DebuggerNonUserCode] public ExprContext expr(int i) {
+			return GetRuleContext<ExprContext>(i);
+		}
+		public MultiDimSliceAccessContext(ExprContext context) { CopyFrom(context); }
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			ILanguageVisitor<TResult> typedVisitor = visitor as ILanguageVisitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitMultiDimSliceAccess(this);
 			else return visitor.VisitChildren(this);
 		}
 	}
@@ -1784,7 +1819,7 @@ public partial class LanguageParser : Parser {
 			int _alt;
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 294;
+			State = 309;
 			ErrorHandler.Sync(this);
 			switch (TokenStream.LA(1)) {
 			case T__30:
@@ -1793,10 +1828,10 @@ public partial class LanguageParser : Parser {
 				Context = _localctx;
 				_prevctx = _localctx;
 
-				State = 227;
+				State = 229;
 				Match(T__30);
-				State = 228;
-				expr(26);
+				State = 230;
+				expr(28);
 				}
 				break;
 			case T__31:
@@ -1804,10 +1839,10 @@ public partial class LanguageParser : Parser {
 				_localctx = new NotContext(_localctx);
 				Context = _localctx;
 				_prevctx = _localctx;
-				State = 229;
+				State = 231;
 				Match(T__31);
-				State = 230;
-				expr(25);
+				State = 232;
+				expr(27);
 				}
 				break;
 			case T__48:
@@ -1815,119 +1850,152 @@ public partial class LanguageParser : Parser {
 				_localctx = new SliceInitContext(_localctx);
 				Context = _localctx;
 				_prevctx = _localctx;
-				State = 231;
-				Match(T__48);
-				State = 232;
-				type();
 				State = 233;
-				Match(T__12);
+				Match(T__48);
 				State = 234;
+				type();
+				State = 235;
+				Match(T__12);
+				State = 236;
 				expr(0);
-				State = 239;
+				State = 241;
 				ErrorHandler.Sync(this);
 				_la = TokenStream.LA(1);
 				while (_la==T__15) {
 					{
 					{
-					State = 235;
+					State = 237;
 					Match(T__15);
-					State = 236;
+					State = 238;
 					expr(0);
 					}
 					}
-					State = 241;
+					State = 243;
 					ErrorHandler.Sync(this);
 					_la = TokenStream.LA(1);
 				}
-				State = 242;
+				State = 244;
 				Match(T__13);
 				}
 				break;
-			case T__51:
+			case T__49:
 				{
-				_localctx = new SliceIndexCallContext(_localctx);
+				_localctx = new MultiDimSliceInitContext(_localctx);
 				Context = _localctx;
 				_prevctx = _localctx;
-				State = 244;
-				Match(T__51);
-				State = 245;
-				Match(T__10);
 				State = 246;
-				expr(0);
+				Match(T__49);
 				State = 247;
-				Match(T__15);
+				type();
 				State = 248;
-				expr(0);
+				Match(T__12);
 				State = 249;
-				Match(T__11);
+				matrixRow();
+				State = 254;
+				ErrorHandler.Sync(this);
+				_la = TokenStream.LA(1);
+				while (_la==T__15) {
+					{
+					{
+					State = 250;
+					Match(T__15);
+					State = 251;
+					matrixRow();
+					}
+					}
+					State = 256;
+					ErrorHandler.Sync(this);
+					_la = TokenStream.LA(1);
+				}
+				State = 257;
+				Match(T__13);
 				}
 				break;
 			case T__52:
 				{
-				_localctx = new StringsJoinCallContext(_localctx);
+				_localctx = new SliceIndexCallContext(_localctx);
 				Context = _localctx;
 				_prevctx = _localctx;
-				State = 251;
+				State = 259;
 				Match(T__52);
-				State = 252;
+				State = 260;
 				Match(T__10);
-				State = 253;
+				State = 261;
 				expr(0);
-				State = 254;
+				State = 262;
 				Match(T__15);
-				State = 255;
+				State = 263;
 				expr(0);
-				State = 256;
+				State = 264;
 				Match(T__11);
 				}
 				break;
 			case T__53:
 				{
-				_localctx = new LenCallContext(_localctx);
+				_localctx = new StringsJoinCallContext(_localctx);
 				Context = _localctx;
 				_prevctx = _localctx;
-				State = 258;
+				State = 266;
 				Match(T__53);
-				State = 259;
+				State = 267;
 				Match(T__10);
-				State = 260;
+				State = 268;
 				expr(0);
-				State = 261;
+				State = 269;
+				Match(T__15);
+				State = 270;
+				expr(0);
+				State = 271;
 				Match(T__11);
 				}
 				break;
 			case T__54:
 				{
+				_localctx = new LenCallContext(_localctx);
+				Context = _localctx;
+				_prevctx = _localctx;
+				State = 273;
+				Match(T__54);
+				State = 274;
+				Match(T__10);
+				State = 275;
+				expr(0);
+				State = 276;
+				Match(T__11);
+				}
+				break;
+			case T__55:
+				{
 				_localctx = new AppendCallContext(_localctx);
 				Context = _localctx;
 				_prevctx = _localctx;
-				State = 263;
-				Match(T__54);
-				State = 264;
+				State = 278;
+				Match(T__55);
+				State = 279;
 				Match(T__10);
-				State = 265;
+				State = 280;
 				expr(0);
-				State = 266;
+				State = 281;
 				Match(T__15);
-				State = 267;
+				State = 282;
 				expr(0);
-				State = 272;
+				State = 287;
 				ErrorHandler.Sync(this);
 				_la = TokenStream.LA(1);
 				while (_la==T__15) {
 					{
 					{
-					State = 268;
+					State = 283;
 					Match(T__15);
-					State = 269;
+					State = 284;
 					expr(0);
 					}
 					}
-					State = 274;
+					State = 289;
 					ErrorHandler.Sync(this);
 					_la = TokenStream.LA(1);
 				}
-				State = 275;
+				State = 290;
 				Match(T__11);
 				}
 				break;
@@ -1936,7 +2004,7 @@ public partial class LanguageParser : Parser {
 				_localctx = new BooleanContext(_localctx);
 				Context = _localctx;
 				_prevctx = _localctx;
-				State = 277;
+				State = 292;
 				Match(BOOL);
 				}
 				break;
@@ -1945,7 +2013,7 @@ public partial class LanguageParser : Parser {
 				_localctx = new FloatContext(_localctx);
 				Context = _localctx;
 				_prevctx = _localctx;
-				State = 278;
+				State = 293;
 				Match(FLOAT);
 				}
 				break;
@@ -1954,7 +2022,7 @@ public partial class LanguageParser : Parser {
 				_localctx = new StringContext(_localctx);
 				Context = _localctx;
 				_prevctx = _localctx;
-				State = 279;
+				State = 294;
 				Match(STRING);
 				}
 				break;
@@ -1963,7 +2031,7 @@ public partial class LanguageParser : Parser {
 				_localctx = new IntContext(_localctx);
 				Context = _localctx;
 				_prevctx = _localctx;
-				State = 280;
+				State = 295;
 				Match(INT);
 				}
 				break;
@@ -1972,32 +2040,32 @@ public partial class LanguageParser : Parser {
 				_localctx = new RuneContext(_localctx);
 				Context = _localctx;
 				_prevctx = _localctx;
-				State = 281;
+				State = 296;
 				Match(RUNE);
 				}
 				break;
-			case T__55:
+			case T__56:
 				{
 				_localctx = new NewContext(_localctx);
 				Context = _localctx;
 				_prevctx = _localctx;
-				State = 282;
-				Match(T__55);
-				State = 283;
+				State = 297;
+				Match(T__56);
+				State = 298;
 				Match(ID);
-				State = 284;
+				State = 299;
 				Match(T__10);
-				State = 286;
+				State = 301;
 				ErrorHandler.Sync(this);
 				_la = TokenStream.LA(1);
-				if (((((_la - 11)) & ~0x3f) == 0 && ((1L << (_la - 11)) & 13438505995730945L) != 0)) {
+				if (((((_la - 11)) & ~0x3f) == 0 && ((1L << (_la - 11)) & 26877286866223105L) != 0)) {
 					{
-					State = 285;
+					State = 300;
 					args();
 					}
 				}
 
-				State = 288;
+				State = 303;
 				Match(T__11);
 				}
 				break;
@@ -2006,7 +2074,7 @@ public partial class LanguageParser : Parser {
 				_localctx = new IdentifierContext(_localctx);
 				Context = _localctx;
 				_prevctx = _localctx;
-				State = 289;
+				State = 304;
 				Match(ID);
 				}
 				break;
@@ -2015,11 +2083,11 @@ public partial class LanguageParser : Parser {
 				_localctx = new ParensContext(_localctx);
 				Context = _localctx;
 				_prevctx = _localctx;
-				State = 290;
+				State = 305;
 				Match(T__10);
-				State = 291;
+				State = 306;
 				expr(0);
-				State = 292;
+				State = 307;
 				Match(T__11);
 				}
 				break;
@@ -2027,25 +2095,25 @@ public partial class LanguageParser : Parser {
 				throw new NoViableAltException(this);
 			}
 			Context.Stop = TokenStream.LT(-1);
-			State = 339;
+			State = 362;
 			ErrorHandler.Sync(this);
-			_alt = Interpreter.AdaptivePredict(TokenStream,27,Context);
+			_alt = Interpreter.AdaptivePredict(TokenStream,28,Context);
 			while ( _alt!=2 && _alt!=global::Antlr4.Runtime.Atn.ATN.INVALID_ALT_NUMBER ) {
 				if ( _alt==1 ) {
 					if ( ParseListeners!=null )
 						TriggerExitRuleEvent();
 					_prevctx = _localctx;
 					{
-					State = 337;
+					State = 360;
 					ErrorHandler.Sync(this);
-					switch ( Interpreter.AdaptivePredict(TokenStream,26,Context) ) {
+					switch ( Interpreter.AdaptivePredict(TokenStream,27,Context) ) {
 					case 1:
 						{
 						_localctx = new MulDivContext(new ExprContext(_parentctx, _parentState));
 						PushNewRecursionContext(_localctx, _startState, RULE_expr);
-						State = 296;
-						if (!(Precpred(Context, 23))) throw new FailedPredicateException(this, "Precpred(Context, 23)");
-						State = 297;
+						State = 311;
+						if (!(Precpred(Context, 25))) throw new FailedPredicateException(this, "Precpred(Context, 25)");
+						State = 312;
 						((MulDivContext)_localctx).op = TokenStream.LT(1);
 						_la = TokenStream.LA(1);
 						if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & 60129542144L) != 0)) ) {
@@ -2055,17 +2123,17 @@ public partial class LanguageParser : Parser {
 							ErrorHandler.ReportMatch(this);
 						    Consume();
 						}
-						State = 298;
-						expr(24);
+						State = 313;
+						expr(26);
 						}
 						break;
 					case 2:
 						{
 						_localctx = new AddSubContext(new ExprContext(_parentctx, _parentState));
 						PushNewRecursionContext(_localctx, _startState, RULE_expr);
-						State = 299;
-						if (!(Precpred(Context, 22))) throw new FailedPredicateException(this, "Precpred(Context, 22)");
-						State = 300;
+						State = 314;
+						if (!(Precpred(Context, 24))) throw new FailedPredicateException(this, "Precpred(Context, 24)");
+						State = 315;
 						((AddSubContext)_localctx).op = TokenStream.LT(1);
 						_la = TokenStream.LA(1);
 						if ( !(_la==T__30 || _la==T__35) ) {
@@ -2075,17 +2143,17 @@ public partial class LanguageParser : Parser {
 							ErrorHandler.ReportMatch(this);
 						    Consume();
 						}
-						State = 301;
-						expr(23);
+						State = 316;
+						expr(25);
 						}
 						break;
 					case 3:
 						{
 						_localctx = new RelationalContext(new ExprContext(_parentctx, _parentState));
 						PushNewRecursionContext(_localctx, _startState, RULE_expr);
-						State = 302;
-						if (!(Precpred(Context, 21))) throw new FailedPredicateException(this, "Precpred(Context, 21)");
-						State = 303;
+						State = 317;
+						if (!(Precpred(Context, 23))) throw new FailedPredicateException(this, "Precpred(Context, 23)");
+						State = 318;
 						((RelationalContext)_localctx).op = TokenStream.LT(1);
 						_la = TokenStream.LA(1);
 						if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & 2061584302080L) != 0)) ) {
@@ -2095,17 +2163,17 @@ public partial class LanguageParser : Parser {
 							ErrorHandler.ReportMatch(this);
 						    Consume();
 						}
-						State = 304;
-						expr(22);
+						State = 319;
+						expr(24);
 						}
 						break;
 					case 4:
 						{
 						_localctx = new EqualityContext(new ExprContext(_parentctx, _parentState));
 						PushNewRecursionContext(_localctx, _startState, RULE_expr);
-						State = 305;
-						if (!(Precpred(Context, 20))) throw new FailedPredicateException(this, "Precpred(Context, 20)");
-						State = 306;
+						State = 320;
+						if (!(Precpred(Context, 22))) throw new FailedPredicateException(this, "Precpred(Context, 22)");
+						State = 321;
 						((EqualityContext)_localctx).op = TokenStream.LT(1);
 						_la = TokenStream.LA(1);
 						if ( !(_la==T__40 || _la==T__41) ) {
@@ -2115,17 +2183,17 @@ public partial class LanguageParser : Parser {
 							ErrorHandler.ReportMatch(this);
 						    Consume();
 						}
-						State = 307;
-						expr(21);
+						State = 322;
+						expr(23);
 						}
 						break;
 					case 5:
 						{
 						_localctx = new AssignOpContext(new ExprContext(_parentctx, _parentState));
 						PushNewRecursionContext(_localctx, _startState, RULE_expr);
-						State = 308;
-						if (!(Precpred(Context, 19))) throw new FailedPredicateException(this, "Precpred(Context, 19)");
-						State = 309;
+						State = 323;
+						if (!(Precpred(Context, 21))) throw new FailedPredicateException(this, "Precpred(Context, 21)");
+						State = 324;
 						((AssignOpContext)_localctx).op = TokenStream.LT(1);
 						_la = TokenStream.LA(1);
 						if ( !(_la==T__42 || _la==T__43) ) {
@@ -2135,17 +2203,17 @@ public partial class LanguageParser : Parser {
 							ErrorHandler.ReportMatch(this);
 						    Consume();
 						}
-						State = 310;
-						expr(20);
+						State = 325;
+						expr(22);
 						}
 						break;
 					case 6:
 						{
 						_localctx = new LogicalContext(new ExprContext(_parentctx, _parentState));
 						PushNewRecursionContext(_localctx, _startState, RULE_expr);
-						State = 311;
-						if (!(Precpred(Context, 18))) throw new FailedPredicateException(this, "Precpred(Context, 18)");
-						State = 312;
+						State = 326;
+						if (!(Precpred(Context, 20))) throw new FailedPredicateException(this, "Precpred(Context, 20)");
+						State = 327;
 						((LogicalContext)_localctx).op = TokenStream.LT(1);
 						_la = TokenStream.LA(1);
 						if ( !(_la==T__44 || _la==T__45) ) {
@@ -2155,17 +2223,17 @@ public partial class LanguageParser : Parser {
 							ErrorHandler.ReportMatch(this);
 						    Consume();
 						}
-						State = 313;
-						expr(19);
+						State = 328;
+						expr(21);
 						}
 						break;
 					case 7:
 						{
 						_localctx = new AssignContext(new ExprContext(_parentctx, _parentState));
 						PushNewRecursionContext(_localctx, _startState, RULE_expr);
-						State = 314;
-						if (!(Precpred(Context, 17))) throw new FailedPredicateException(this, "Precpred(Context, 17)");
-						State = 315;
+						State = 329;
+						if (!(Precpred(Context, 19))) throw new FailedPredicateException(this, "Precpred(Context, 19)");
+						State = 330;
 						_la = TokenStream.LA(1);
 						if ( !(_la==T__2 || _la==T__3) ) {
 						ErrorHandler.RecoverInline(this);
@@ -2174,17 +2242,17 @@ public partial class LanguageParser : Parser {
 							ErrorHandler.ReportMatch(this);
 						    Consume();
 						}
-						State = 316;
-						expr(18);
+						State = 331;
+						expr(20);
 						}
 						break;
 					case 8:
 						{
 						_localctx = new CalleeContext(new ExprContext(_parentctx, _parentState));
 						PushNewRecursionContext(_localctx, _startState, RULE_expr);
-						State = 317;
-						if (!(Precpred(Context, 24))) throw new FailedPredicateException(this, "Precpred(Context, 24)");
-						State = 319;
+						State = 332;
+						if (!(Precpred(Context, 26))) throw new FailedPredicateException(this, "Precpred(Context, 26)");
+						State = 334;
 						ErrorHandler.Sync(this);
 						_alt = 1;
 						do {
@@ -2192,7 +2260,7 @@ public partial class LanguageParser : Parser {
 							case 1:
 								{
 								{
-								State = 318;
+								State = 333;
 								call();
 								}
 								}
@@ -2200,9 +2268,9 @@ public partial class LanguageParser : Parser {
 							default:
 								throw new NoViableAltException(this);
 							}
-							State = 321;
+							State = 336;
 							ErrorHandler.Sync(this);
-							_alt = Interpreter.AdaptivePredict(TokenStream,25,Context);
+							_alt = Interpreter.AdaptivePredict(TokenStream,26,Context);
 						} while ( _alt!=2 && _alt!=global::Antlr4.Runtime.Atn.ATN.INVALID_ALT_NUMBER );
 						}
 						break;
@@ -2210,9 +2278,9 @@ public partial class LanguageParser : Parser {
 						{
 						_localctx = new IncDecContext(new ExprContext(_parentctx, _parentState));
 						PushNewRecursionContext(_localctx, _startState, RULE_expr);
-						State = 323;
-						if (!(Precpred(Context, 16))) throw new FailedPredicateException(this, "Precpred(Context, 16)");
-						State = 324;
+						State = 338;
+						if (!(Precpred(Context, 18))) throw new FailedPredicateException(this, "Precpred(Context, 18)");
+						State = 339;
 						_la = TokenStream.LA(1);
 						if ( !(_la==T__46 || _la==T__47) ) {
 						ErrorHandler.RecoverInline(this);
@@ -2225,42 +2293,62 @@ public partial class LanguageParser : Parser {
 						break;
 					case 10:
 						{
-						_localctx = new SliceAccessContext(new ExprContext(_parentctx, _parentState));
+						_localctx = new MultiDimSliceAccessContext(new ExprContext(_parentctx, _parentState));
 						PushNewRecursionContext(_localctx, _startState, RULE_expr);
-						State = 325;
-						if (!(Precpred(Context, 14))) throw new FailedPredicateException(this, "Precpred(Context, 14)");
-						State = 326;
-						Match(T__49);
-						State = 327;
-						expr(0);
-						State = 328;
+						State = 340;
+						if (!(Precpred(Context, 15))) throw new FailedPredicateException(this, "Precpred(Context, 15)");
+						State = 341;
 						Match(T__50);
+						State = 342;
+						expr(0);
+						State = 343;
+						Match(T__51);
+						State = 344;
+						Match(T__50);
+						State = 345;
+						expr(0);
+						State = 346;
+						Match(T__51);
 						}
 						break;
 					case 11:
 						{
+						_localctx = new SliceAccessContext(new ExprContext(_parentctx, _parentState));
+						PushNewRecursionContext(_localctx, _startState, RULE_expr);
+						State = 348;
+						if (!(Precpred(Context, 14))) throw new FailedPredicateException(this, "Precpred(Context, 14)");
+						State = 349;
+						Match(T__50);
+						State = 350;
+						expr(0);
+						State = 351;
+						Match(T__51);
+						}
+						break;
+					case 12:
+						{
 						_localctx = new SliceRangeContext(new ExprContext(_parentctx, _parentState));
 						PushNewRecursionContext(_localctx, _startState, RULE_expr);
-						State = 330;
+						State = 353;
 						if (!(Precpred(Context, 13))) throw new FailedPredicateException(this, "Precpred(Context, 13)");
-						State = 331;
-						Match(T__49);
-						State = 332;
-						expr(0);
-						State = 333;
-						Match(T__1);
-						State = 334;
-						expr(0);
-						State = 335;
+						State = 354;
 						Match(T__50);
+						State = 355;
+						expr(0);
+						State = 356;
+						Match(T__1);
+						State = 357;
+						expr(0);
+						State = 358;
+						Match(T__51);
 						}
 						break;
 					}
 					} 
 				}
-				State = 341;
+				State = 364;
 				ErrorHandler.Sync(this);
-				_alt = Interpreter.AdaptivePredict(TokenStream,27,Context);
+				_alt = Interpreter.AdaptivePredict(TokenStream,28,Context);
 			}
 			}
 		}
@@ -2316,36 +2404,36 @@ public partial class LanguageParser : Parser {
 		EnterRule(_localctx, 28, RULE_call);
 		int _la;
 		try {
-			State = 349;
+			State = 372;
 			ErrorHandler.Sync(this);
 			switch (TokenStream.LA(1)) {
 			case T__10:
 				_localctx = new FuncCallContext(_localctx);
 				EnterOuterAlt(_localctx, 1);
 				{
-				State = 342;
+				State = 365;
 				Match(T__10);
-				State = 344;
+				State = 367;
 				ErrorHandler.Sync(this);
 				_la = TokenStream.LA(1);
-				if (((((_la - 11)) & ~0x3f) == 0 && ((1L << (_la - 11)) & 13438505995730945L) != 0)) {
+				if (((((_la - 11)) & ~0x3f) == 0 && ((1L << (_la - 11)) & 26877286866223105L) != 0)) {
 					{
-					State = 343;
+					State = 366;
 					args();
 					}
 				}
 
-				State = 346;
+				State = 369;
 				Match(T__11);
 				}
 				break;
-			case T__56:
+			case T__57:
 				_localctx = new GetContext(_localctx);
 				EnterOuterAlt(_localctx, 2);
 				{
-				State = 347;
-				Match(T__56);
-				State = 348;
+				State = 370;
+				Match(T__57);
+				State = 371;
 				Match(ID);
 				}
 				break;
@@ -2392,24 +2480,87 @@ public partial class LanguageParser : Parser {
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 351;
+			State = 374;
 			expr(0);
-			State = 356;
+			State = 379;
 			ErrorHandler.Sync(this);
 			_la = TokenStream.LA(1);
 			while (_la==T__15) {
 				{
 				{
-				State = 352;
+				State = 375;
 				Match(T__15);
-				State = 353;
+				State = 376;
 				expr(0);
 				}
 				}
-				State = 358;
+				State = 381;
 				ErrorHandler.Sync(this);
 				_la = TokenStream.LA(1);
 			}
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			ErrorHandler.ReportError(this, re);
+			ErrorHandler.Recover(this, re);
+		}
+		finally {
+			ExitRule();
+		}
+		return _localctx;
+	}
+
+	public partial class MatrixRowContext : ParserRuleContext {
+		[System.Diagnostics.DebuggerNonUserCode] public ExprContext[] expr() {
+			return GetRuleContexts<ExprContext>();
+		}
+		[System.Diagnostics.DebuggerNonUserCode] public ExprContext expr(int i) {
+			return GetRuleContext<ExprContext>(i);
+		}
+		public MatrixRowContext(ParserRuleContext parent, int invokingState)
+			: base(parent, invokingState)
+		{
+		}
+		public override int RuleIndex { get { return RULE_matrixRow; } }
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			ILanguageVisitor<TResult> typedVisitor = visitor as ILanguageVisitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitMatrixRow(this);
+			else return visitor.VisitChildren(this);
+		}
+	}
+
+	[RuleVersion(0)]
+	public MatrixRowContext matrixRow() {
+		MatrixRowContext _localctx = new MatrixRowContext(Context, State);
+		EnterRule(_localctx, 32, RULE_matrixRow);
+		int _la;
+		try {
+			EnterOuterAlt(_localctx, 1);
+			{
+			State = 382;
+			Match(T__12);
+			State = 383;
+			expr(0);
+			State = 388;
+			ErrorHandler.Sync(this);
+			_la = TokenStream.LA(1);
+			while (_la==T__15) {
+				{
+				{
+				State = 384;
+				Match(T__15);
+				State = 385;
+				expr(0);
+				}
+				}
+				State = 390;
+				ErrorHandler.Sync(this);
+				_la = TokenStream.LA(1);
+			}
+			State = 391;
+			Match(T__13);
 			}
 		}
 		catch (RecognitionException re) {
@@ -2431,145 +2582,158 @@ public partial class LanguageParser : Parser {
 	}
 	private bool expr_sempred(ExprContext _localctx, int predIndex) {
 		switch (predIndex) {
-		case 0: return Precpred(Context, 23);
-		case 1: return Precpred(Context, 22);
-		case 2: return Precpred(Context, 21);
-		case 3: return Precpred(Context, 20);
-		case 4: return Precpred(Context, 19);
-		case 5: return Precpred(Context, 18);
-		case 6: return Precpred(Context, 17);
-		case 7: return Precpred(Context, 24);
-		case 8: return Precpred(Context, 16);
-		case 9: return Precpred(Context, 14);
-		case 10: return Precpred(Context, 13);
+		case 0: return Precpred(Context, 25);
+		case 1: return Precpred(Context, 24);
+		case 2: return Precpred(Context, 23);
+		case 3: return Precpred(Context, 22);
+		case 4: return Precpred(Context, 21);
+		case 5: return Precpred(Context, 20);
+		case 6: return Precpred(Context, 19);
+		case 7: return Precpred(Context, 26);
+		case 8: return Precpred(Context, 18);
+		case 9: return Precpred(Context, 15);
+		case 10: return Precpred(Context, 14);
+		case 11: return Precpred(Context, 13);
 		}
 		return true;
 	}
 
 	private static int[] _serializedATN = {
-		4,1,67,360,2,0,7,0,2,1,7,1,2,2,7,2,2,3,7,3,2,4,7,4,2,5,7,5,2,6,7,6,2,7,
+		4,1,68,394,2,0,7,0,2,1,7,1,2,2,7,2,2,3,7,3,2,4,7,4,2,5,7,5,2,6,7,6,2,7,
 		7,7,2,8,7,8,2,9,7,9,2,10,7,10,2,11,7,11,2,12,7,12,2,13,7,13,2,14,7,14,
-		2,15,7,15,1,0,5,0,34,8,0,10,0,12,0,37,9,0,1,1,1,1,1,1,1,1,1,1,3,1,44,8,
-		1,1,2,1,2,1,2,1,2,1,2,1,2,3,2,52,8,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,3,2,61,
-		8,2,1,3,1,3,1,4,1,4,1,4,1,4,3,4,69,8,4,1,4,1,4,1,4,5,4,74,8,4,10,4,12,
-		4,77,9,4,1,4,1,4,1,5,1,5,1,5,1,5,5,5,85,8,5,10,5,12,5,88,9,5,1,5,1,5,1,
-		6,1,6,3,6,94,8,6,1,7,1,7,1,7,5,7,99,8,7,10,7,12,7,102,9,7,1,7,1,7,1,7,
-		1,7,1,7,1,7,1,7,1,7,1,7,5,7,113,8,7,10,7,12,7,116,9,7,3,7,118,8,7,1,8,
-		1,8,1,8,1,8,1,8,3,8,125,8,8,1,8,1,8,1,8,5,8,130,8,8,10,8,12,8,133,9,8,
-		1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,5,8,143,8,8,10,8,12,8,146,9,8,1,8,1,8,
-		3,8,150,8,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,5,8,162,8,8,10,8,12,
-		8,165,9,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,
-		1,8,1,8,1,8,1,8,1,8,5,8,187,8,8,10,8,12,8,190,9,8,1,8,1,8,1,8,1,8,1,8,
-		1,8,1,8,1,8,1,8,1,8,1,8,1,8,3,8,204,8,8,3,8,206,8,8,1,9,1,9,3,9,210,8,
-		9,1,10,1,10,1,10,1,10,1,10,1,11,1,11,1,11,1,11,1,12,1,12,1,12,1,12,3,12,
-		225,8,12,1,13,1,13,1,13,1,13,1,13,1,13,1,13,1,13,1,13,1,13,1,13,5,13,238,
-		8,13,10,13,12,13,241,9,13,1,13,1,13,1,13,1,13,1,13,1,13,1,13,1,13,1,13,
+		2,15,7,15,2,16,7,16,1,0,5,0,36,8,0,10,0,12,0,39,9,0,1,1,1,1,1,1,1,1,1,
+		1,3,1,46,8,1,1,2,1,2,1,2,1,2,1,2,1,2,3,2,54,8,2,1,2,1,2,1,2,1,2,1,2,1,
+		2,1,2,3,2,63,8,2,1,3,1,3,1,4,1,4,1,4,1,4,3,4,71,8,4,1,4,1,4,1,4,5,4,76,
+		8,4,10,4,12,4,79,9,4,1,4,1,4,1,5,1,5,1,5,1,5,5,5,87,8,5,10,5,12,5,90,9,
+		5,1,5,1,5,1,6,1,6,3,6,96,8,6,1,7,1,7,1,7,5,7,101,8,7,10,7,12,7,104,9,7,
+		1,7,1,7,1,7,1,7,1,7,1,7,1,7,1,7,1,7,5,7,115,8,7,10,7,12,7,118,9,7,3,7,
+		120,8,7,1,8,1,8,1,8,1,8,1,8,3,8,127,8,8,1,8,1,8,1,8,5,8,132,8,8,10,8,12,
+		8,135,9,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,5,8,145,8,8,10,8,12,8,148,9,
+		8,1,8,1,8,3,8,152,8,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,5,8,164,
+		8,8,10,8,12,8,167,9,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,
+		1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,5,8,189,8,8,10,8,12,8,192,9,8,1,8,1,8,
+		1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,3,8,206,8,8,3,8,208,8,8,1,9,1,
+		9,3,9,212,8,9,1,10,1,10,1,10,1,10,1,10,1,11,1,11,1,11,1,11,1,12,1,12,1,
+		12,1,12,3,12,227,8,12,1,13,1,13,1,13,1,13,1,13,1,13,1,13,1,13,1,13,1,13,
+		1,13,5,13,240,8,13,10,13,12,13,243,9,13,1,13,1,13,1,13,1,13,1,13,1,13,
+		1,13,1,13,5,13,253,8,13,10,13,12,13,256,9,13,1,13,1,13,1,13,1,13,1,13,
 		1,13,1,13,1,13,1,13,1,13,1,13,1,13,1,13,1,13,1,13,1,13,1,13,1,13,1,13,
-		1,13,1,13,1,13,1,13,1,13,5,13,271,8,13,10,13,12,13,274,9,13,1,13,1,13,
-		1,13,1,13,1,13,1,13,1,13,1,13,1,13,1,13,1,13,3,13,287,8,13,1,13,1,13,1,
-		13,1,13,1,13,1,13,3,13,295,8,13,1,13,1,13,1,13,1,13,1,13,1,13,1,13,1,13,
-		1,13,1,13,1,13,1,13,1,13,1,13,1,13,1,13,1,13,1,13,1,13,1,13,1,13,1,13,
-		1,13,4,13,320,8,13,11,13,12,13,321,1,13,1,13,1,13,1,13,1,13,1,13,1,13,
-		1,13,1,13,1,13,1,13,1,13,1,13,1,13,5,13,338,8,13,10,13,12,13,341,9,13,
-		1,14,1,14,3,14,345,8,14,1,14,1,14,1,14,3,14,350,8,14,1,15,1,15,1,15,5,
-		15,355,8,15,10,15,12,15,358,9,15,1,15,0,1,26,16,0,2,4,6,8,10,12,14,16,
-		18,20,22,24,26,28,30,0,9,1,0,5,9,1,0,33,35,2,0,31,31,36,36,1,0,37,40,1,
-		0,41,42,1,0,43,44,1,0,45,46,1,0,3,4,1,0,47,48,412,0,35,1,0,0,0,2,43,1,
-		0,0,0,4,60,1,0,0,0,6,62,1,0,0,0,8,64,1,0,0,0,10,80,1,0,0,0,12,93,1,0,0,
-		0,14,117,1,0,0,0,16,205,1,0,0,0,18,209,1,0,0,0,20,211,1,0,0,0,22,216,1,
-		0,0,0,24,224,1,0,0,0,26,294,1,0,0,0,28,349,1,0,0,0,30,351,1,0,0,0,32,34,
-		3,2,1,0,33,32,1,0,0,0,34,37,1,0,0,0,35,33,1,0,0,0,35,36,1,0,0,0,36,1,1,
-		0,0,0,37,35,1,0,0,0,38,44,3,4,2,0,39,44,3,16,8,0,40,44,3,8,4,0,41,44,3,
-		10,5,0,42,44,3,26,13,0,43,38,1,0,0,0,43,39,1,0,0,0,43,40,1,0,0,0,43,41,
-		1,0,0,0,43,42,1,0,0,0,44,3,1,0,0,0,45,46,5,1,0,0,46,47,5,64,0,0,47,48,
-		5,2,0,0,48,51,3,6,3,0,49,50,5,3,0,0,50,52,3,26,13,0,51,49,1,0,0,0,51,52,
-		1,0,0,0,52,61,1,0,0,0,53,54,5,1,0,0,54,55,5,64,0,0,55,56,5,3,0,0,56,61,
-		3,26,13,0,57,58,5,64,0,0,58,59,5,4,0,0,59,61,3,26,13,0,60,45,1,0,0,0,60,
-		53,1,0,0,0,60,57,1,0,0,0,61,5,1,0,0,0,62,63,7,0,0,0,63,7,1,0,0,0,64,65,
-		5,10,0,0,65,66,5,64,0,0,66,68,5,11,0,0,67,69,3,14,7,0,68,67,1,0,0,0,68,
-		69,1,0,0,0,69,70,1,0,0,0,70,71,5,12,0,0,71,75,5,13,0,0,72,74,3,2,1,0,73,
-		72,1,0,0,0,74,77,1,0,0,0,75,73,1,0,0,0,75,76,1,0,0,0,76,78,1,0,0,0,77,
-		75,1,0,0,0,78,79,5,14,0,0,79,9,1,0,0,0,80,81,5,15,0,0,81,82,5,64,0,0,82,
-		86,5,13,0,0,83,85,3,12,6,0,84,83,1,0,0,0,85,88,1,0,0,0,86,84,1,0,0,0,86,
-		87,1,0,0,0,87,89,1,0,0,0,88,86,1,0,0,0,89,90,5,14,0,0,90,11,1,0,0,0,91,
-		94,3,4,2,0,92,94,3,8,4,0,93,91,1,0,0,0,93,92,1,0,0,0,94,13,1,0,0,0,95,
-		100,5,64,0,0,96,97,5,16,0,0,97,99,5,64,0,0,98,96,1,0,0,0,99,102,1,0,0,
-		0,100,98,1,0,0,0,100,101,1,0,0,0,101,118,1,0,0,0,102,100,1,0,0,0,103,104,
-		5,1,0,0,104,105,5,64,0,0,105,106,5,2,0,0,106,114,3,6,3,0,107,108,5,16,
-		0,0,108,109,5,1,0,0,109,110,5,64,0,0,110,111,5,2,0,0,111,113,3,6,3,0,112,
-		107,1,0,0,0,113,116,1,0,0,0,114,112,1,0,0,0,114,115,1,0,0,0,115,118,1,
-		0,0,0,116,114,1,0,0,0,117,95,1,0,0,0,117,103,1,0,0,0,118,15,1,0,0,0,119,
-		120,3,26,13,0,120,121,5,17,0,0,121,206,1,0,0,0,122,124,5,18,0,0,123,125,
-		3,30,15,0,124,123,1,0,0,0,124,125,1,0,0,0,125,126,1,0,0,0,126,206,5,12,
-		0,0,127,131,5,13,0,0,128,130,3,2,1,0,129,128,1,0,0,0,130,133,1,0,0,0,131,
-		129,1,0,0,0,131,132,1,0,0,0,132,134,1,0,0,0,133,131,1,0,0,0,134,206,5,
-		14,0,0,135,136,5,19,0,0,136,137,3,26,13,0,137,144,3,16,8,0,138,139,5,20,
-		0,0,139,140,3,26,13,0,140,141,3,16,8,0,141,143,1,0,0,0,142,138,1,0,0,0,
-		143,146,1,0,0,0,144,142,1,0,0,0,144,145,1,0,0,0,145,149,1,0,0,0,146,144,
-		1,0,0,0,147,148,5,21,0,0,148,150,3,16,8,0,149,147,1,0,0,0,149,150,1,0,
-		0,0,150,206,1,0,0,0,151,152,5,22,0,0,152,153,5,11,0,0,153,154,3,26,13,
-		0,154,155,5,12,0,0,155,156,3,16,8,0,156,206,1,0,0,0,157,158,5,23,0,0,158,
-		159,3,26,13,0,159,163,5,13,0,0,160,162,3,16,8,0,161,160,1,0,0,0,162,165,
-		1,0,0,0,163,161,1,0,0,0,163,164,1,0,0,0,164,166,1,0,0,0,165,163,1,0,0,
-		0,166,167,5,14,0,0,167,206,1,0,0,0,168,169,5,23,0,0,169,170,3,24,12,0,
-		170,171,3,26,13,0,171,172,5,17,0,0,172,173,3,26,13,0,173,174,3,16,8,0,
-		174,206,1,0,0,0,175,176,5,24,0,0,176,177,3,16,8,0,177,178,5,22,0,0,178,
-		179,5,11,0,0,179,180,3,26,13,0,180,181,5,12,0,0,181,206,1,0,0,0,182,183,
-		5,25,0,0,183,184,3,26,13,0,184,188,5,13,0,0,185,187,3,18,9,0,186,185,1,
-		0,0,0,187,190,1,0,0,0,188,186,1,0,0,0,188,189,1,0,0,0,189,191,1,0,0,0,
-		190,188,1,0,0,0,191,192,5,14,0,0,192,206,1,0,0,0,193,194,5,26,0,0,194,
-		195,3,26,13,0,195,196,3,16,8,0,196,206,1,0,0,0,197,198,5,27,0,0,198,206,
-		3,16,8,0,199,206,5,28,0,0,200,206,5,29,0,0,201,203,5,30,0,0,202,204,3,
-		26,13,0,203,202,1,0,0,0,203,204,1,0,0,0,204,206,1,0,0,0,205,119,1,0,0,
-		0,205,122,1,0,0,0,205,127,1,0,0,0,205,135,1,0,0,0,205,151,1,0,0,0,205,
-		157,1,0,0,0,205,168,1,0,0,0,205,175,1,0,0,0,205,182,1,0,0,0,205,193,1,
-		0,0,0,205,197,1,0,0,0,205,199,1,0,0,0,205,200,1,0,0,0,205,201,1,0,0,0,
-		206,17,1,0,0,0,207,210,3,20,10,0,208,210,3,22,11,0,209,207,1,0,0,0,209,
-		208,1,0,0,0,210,19,1,0,0,0,211,212,5,26,0,0,212,213,3,26,13,0,213,214,
-		5,2,0,0,214,215,3,16,8,0,215,21,1,0,0,0,216,217,5,27,0,0,217,218,5,2,0,
-		0,218,219,3,16,8,0,219,23,1,0,0,0,220,225,3,4,2,0,221,222,3,26,13,0,222,
-		223,5,17,0,0,223,225,1,0,0,0,224,220,1,0,0,0,224,221,1,0,0,0,225,25,1,
-		0,0,0,226,227,6,13,-1,0,227,228,5,31,0,0,228,295,3,26,13,26,229,230,5,
-		32,0,0,230,295,3,26,13,25,231,232,5,49,0,0,232,233,3,6,3,0,233,234,5,13,
-		0,0,234,239,3,26,13,0,235,236,5,16,0,0,236,238,3,26,13,0,237,235,1,0,0,
-		0,238,241,1,0,0,0,239,237,1,0,0,0,239,240,1,0,0,0,240,242,1,0,0,0,241,
-		239,1,0,0,0,242,243,5,14,0,0,243,295,1,0,0,0,244,245,5,52,0,0,245,246,
-		5,11,0,0,246,247,3,26,13,0,247,248,5,16,0,0,248,249,3,26,13,0,249,250,
-		5,12,0,0,250,295,1,0,0,0,251,252,5,53,0,0,252,253,5,11,0,0,253,254,3,26,
-		13,0,254,255,5,16,0,0,255,256,3,26,13,0,256,257,5,12,0,0,257,295,1,0,0,
-		0,258,259,5,54,0,0,259,260,5,11,0,0,260,261,3,26,13,0,261,262,5,12,0,0,
-		262,295,1,0,0,0,263,264,5,55,0,0,264,265,5,11,0,0,265,266,3,26,13,0,266,
-		267,5,16,0,0,267,272,3,26,13,0,268,269,5,16,0,0,269,271,3,26,13,0,270,
-		268,1,0,0,0,271,274,1,0,0,0,272,270,1,0,0,0,272,273,1,0,0,0,273,275,1,
-		0,0,0,274,272,1,0,0,0,275,276,5,12,0,0,276,295,1,0,0,0,277,295,5,59,0,
-		0,278,295,5,60,0,0,279,295,5,61,0,0,280,295,5,58,0,0,281,295,5,62,0,0,
-		282,283,5,56,0,0,283,284,5,64,0,0,284,286,5,11,0,0,285,287,3,30,15,0,286,
-		285,1,0,0,0,286,287,1,0,0,0,287,288,1,0,0,0,288,295,5,12,0,0,289,295,5,
-		64,0,0,290,291,5,11,0,0,291,292,3,26,13,0,292,293,5,12,0,0,293,295,1,0,
-		0,0,294,226,1,0,0,0,294,229,1,0,0,0,294,231,1,0,0,0,294,244,1,0,0,0,294,
-		251,1,0,0,0,294,258,1,0,0,0,294,263,1,0,0,0,294,277,1,0,0,0,294,278,1,
-		0,0,0,294,279,1,0,0,0,294,280,1,0,0,0,294,281,1,0,0,0,294,282,1,0,0,0,
-		294,289,1,0,0,0,294,290,1,0,0,0,295,339,1,0,0,0,296,297,10,23,0,0,297,
-		298,7,1,0,0,298,338,3,26,13,24,299,300,10,22,0,0,300,301,7,2,0,0,301,338,
-		3,26,13,23,302,303,10,21,0,0,303,304,7,3,0,0,304,338,3,26,13,22,305,306,
-		10,20,0,0,306,307,7,4,0,0,307,338,3,26,13,21,308,309,10,19,0,0,309,310,
-		7,5,0,0,310,338,3,26,13,20,311,312,10,18,0,0,312,313,7,6,0,0,313,338,3,
-		26,13,19,314,315,10,17,0,0,315,316,7,7,0,0,316,338,3,26,13,18,317,319,
-		10,24,0,0,318,320,3,28,14,0,319,318,1,0,0,0,320,321,1,0,0,0,321,319,1,
-		0,0,0,321,322,1,0,0,0,322,338,1,0,0,0,323,324,10,16,0,0,324,338,7,8,0,
-		0,325,326,10,14,0,0,326,327,5,50,0,0,327,328,3,26,13,0,328,329,5,51,0,
-		0,329,338,1,0,0,0,330,331,10,13,0,0,331,332,5,50,0,0,332,333,3,26,13,0,
-		333,334,5,2,0,0,334,335,3,26,13,0,335,336,5,51,0,0,336,338,1,0,0,0,337,
-		296,1,0,0,0,337,299,1,0,0,0,337,302,1,0,0,0,337,305,1,0,0,0,337,308,1,
-		0,0,0,337,311,1,0,0,0,337,314,1,0,0,0,337,317,1,0,0,0,337,323,1,0,0,0,
-		337,325,1,0,0,0,337,330,1,0,0,0,338,341,1,0,0,0,339,337,1,0,0,0,339,340,
-		1,0,0,0,340,27,1,0,0,0,341,339,1,0,0,0,342,344,5,11,0,0,343,345,3,30,15,
-		0,344,343,1,0,0,0,344,345,1,0,0,0,345,346,1,0,0,0,346,350,5,12,0,0,347,
-		348,5,57,0,0,348,350,5,64,0,0,349,342,1,0,0,0,349,347,1,0,0,0,350,29,1,
-		0,0,0,351,356,3,26,13,0,352,353,5,16,0,0,353,355,3,26,13,0,354,352,1,0,
-		0,0,355,358,1,0,0,0,356,354,1,0,0,0,356,357,1,0,0,0,357,31,1,0,0,0,358,
-		356,1,0,0,0,31,35,43,51,60,68,75,86,93,100,114,117,124,131,144,149,163,
-		188,203,205,209,224,239,272,286,294,321,337,339,344,349,356
+		1,13,1,13,1,13,1,13,1,13,1,13,1,13,1,13,1,13,5,13,286,8,13,10,13,12,13,
+		289,9,13,1,13,1,13,1,13,1,13,1,13,1,13,1,13,1,13,1,13,1,13,1,13,3,13,302,
+		8,13,1,13,1,13,1,13,1,13,1,13,1,13,3,13,310,8,13,1,13,1,13,1,13,1,13,1,
+		13,1,13,1,13,1,13,1,13,1,13,1,13,1,13,1,13,1,13,1,13,1,13,1,13,1,13,1,
+		13,1,13,1,13,1,13,1,13,4,13,335,8,13,11,13,12,13,336,1,13,1,13,1,13,1,
+		13,1,13,1,13,1,13,1,13,1,13,1,13,1,13,1,13,1,13,1,13,1,13,1,13,1,13,1,
+		13,1,13,1,13,1,13,1,13,5,13,361,8,13,10,13,12,13,364,9,13,1,14,1,14,3,
+		14,368,8,14,1,14,1,14,1,14,3,14,373,8,14,1,15,1,15,1,15,5,15,378,8,15,
+		10,15,12,15,381,9,15,1,16,1,16,1,16,1,16,5,16,387,8,16,10,16,12,16,390,
+		9,16,1,16,1,16,1,16,0,1,26,17,0,2,4,6,8,10,12,14,16,18,20,22,24,26,28,
+		30,32,0,9,1,0,5,9,1,0,33,35,2,0,31,31,36,36,1,0,37,40,1,0,41,42,1,0,43,
+		44,1,0,45,46,1,0,3,4,1,0,47,48,449,0,37,1,0,0,0,2,45,1,0,0,0,4,62,1,0,
+		0,0,6,64,1,0,0,0,8,66,1,0,0,0,10,82,1,0,0,0,12,95,1,0,0,0,14,119,1,0,0,
+		0,16,207,1,0,0,0,18,211,1,0,0,0,20,213,1,0,0,0,22,218,1,0,0,0,24,226,1,
+		0,0,0,26,309,1,0,0,0,28,372,1,0,0,0,30,374,1,0,0,0,32,382,1,0,0,0,34,36,
+		3,2,1,0,35,34,1,0,0,0,36,39,1,0,0,0,37,35,1,0,0,0,37,38,1,0,0,0,38,1,1,
+		0,0,0,39,37,1,0,0,0,40,46,3,4,2,0,41,46,3,16,8,0,42,46,3,8,4,0,43,46,3,
+		10,5,0,44,46,3,26,13,0,45,40,1,0,0,0,45,41,1,0,0,0,45,42,1,0,0,0,45,43,
+		1,0,0,0,45,44,1,0,0,0,46,3,1,0,0,0,47,48,5,1,0,0,48,49,5,65,0,0,49,50,
+		5,2,0,0,50,53,3,6,3,0,51,52,5,3,0,0,52,54,3,26,13,0,53,51,1,0,0,0,53,54,
+		1,0,0,0,54,63,1,0,0,0,55,56,5,1,0,0,56,57,5,65,0,0,57,58,5,3,0,0,58,63,
+		3,26,13,0,59,60,5,65,0,0,60,61,5,4,0,0,61,63,3,26,13,0,62,47,1,0,0,0,62,
+		55,1,0,0,0,62,59,1,0,0,0,63,5,1,0,0,0,64,65,7,0,0,0,65,7,1,0,0,0,66,67,
+		5,10,0,0,67,68,5,65,0,0,68,70,5,11,0,0,69,71,3,14,7,0,70,69,1,0,0,0,70,
+		71,1,0,0,0,71,72,1,0,0,0,72,73,5,12,0,0,73,77,5,13,0,0,74,76,3,2,1,0,75,
+		74,1,0,0,0,76,79,1,0,0,0,77,75,1,0,0,0,77,78,1,0,0,0,78,80,1,0,0,0,79,
+		77,1,0,0,0,80,81,5,14,0,0,81,9,1,0,0,0,82,83,5,15,0,0,83,84,5,65,0,0,84,
+		88,5,13,0,0,85,87,3,12,6,0,86,85,1,0,0,0,87,90,1,0,0,0,88,86,1,0,0,0,88,
+		89,1,0,0,0,89,91,1,0,0,0,90,88,1,0,0,0,91,92,5,14,0,0,92,11,1,0,0,0,93,
+		96,3,4,2,0,94,96,3,8,4,0,95,93,1,0,0,0,95,94,1,0,0,0,96,13,1,0,0,0,97,
+		102,5,65,0,0,98,99,5,16,0,0,99,101,5,65,0,0,100,98,1,0,0,0,101,104,1,0,
+		0,0,102,100,1,0,0,0,102,103,1,0,0,0,103,120,1,0,0,0,104,102,1,0,0,0,105,
+		106,5,1,0,0,106,107,5,65,0,0,107,108,5,2,0,0,108,116,3,6,3,0,109,110,5,
+		16,0,0,110,111,5,1,0,0,111,112,5,65,0,0,112,113,5,2,0,0,113,115,3,6,3,
+		0,114,109,1,0,0,0,115,118,1,0,0,0,116,114,1,0,0,0,116,117,1,0,0,0,117,
+		120,1,0,0,0,118,116,1,0,0,0,119,97,1,0,0,0,119,105,1,0,0,0,120,15,1,0,
+		0,0,121,122,3,26,13,0,122,123,5,17,0,0,123,208,1,0,0,0,124,126,5,18,0,
+		0,125,127,3,30,15,0,126,125,1,0,0,0,126,127,1,0,0,0,127,128,1,0,0,0,128,
+		208,5,12,0,0,129,133,5,13,0,0,130,132,3,2,1,0,131,130,1,0,0,0,132,135,
+		1,0,0,0,133,131,1,0,0,0,133,134,1,0,0,0,134,136,1,0,0,0,135,133,1,0,0,
+		0,136,208,5,14,0,0,137,138,5,19,0,0,138,139,3,26,13,0,139,146,3,16,8,0,
+		140,141,5,20,0,0,141,142,3,26,13,0,142,143,3,16,8,0,143,145,1,0,0,0,144,
+		140,1,0,0,0,145,148,1,0,0,0,146,144,1,0,0,0,146,147,1,0,0,0,147,151,1,
+		0,0,0,148,146,1,0,0,0,149,150,5,21,0,0,150,152,3,16,8,0,151,149,1,0,0,
+		0,151,152,1,0,0,0,152,208,1,0,0,0,153,154,5,22,0,0,154,155,5,11,0,0,155,
+		156,3,26,13,0,156,157,5,12,0,0,157,158,3,16,8,0,158,208,1,0,0,0,159,160,
+		5,23,0,0,160,161,3,26,13,0,161,165,5,13,0,0,162,164,3,16,8,0,163,162,1,
+		0,0,0,164,167,1,0,0,0,165,163,1,0,0,0,165,166,1,0,0,0,166,168,1,0,0,0,
+		167,165,1,0,0,0,168,169,5,14,0,0,169,208,1,0,0,0,170,171,5,23,0,0,171,
+		172,3,24,12,0,172,173,3,26,13,0,173,174,5,17,0,0,174,175,3,26,13,0,175,
+		176,3,16,8,0,176,208,1,0,0,0,177,178,5,24,0,0,178,179,3,16,8,0,179,180,
+		5,22,0,0,180,181,5,11,0,0,181,182,3,26,13,0,182,183,5,12,0,0,183,208,1,
+		0,0,0,184,185,5,25,0,0,185,186,3,26,13,0,186,190,5,13,0,0,187,189,3,18,
+		9,0,188,187,1,0,0,0,189,192,1,0,0,0,190,188,1,0,0,0,190,191,1,0,0,0,191,
+		193,1,0,0,0,192,190,1,0,0,0,193,194,5,14,0,0,194,208,1,0,0,0,195,196,5,
+		26,0,0,196,197,3,26,13,0,197,198,3,16,8,0,198,208,1,0,0,0,199,200,5,27,
+		0,0,200,208,3,16,8,0,201,208,5,28,0,0,202,208,5,29,0,0,203,205,5,30,0,
+		0,204,206,3,26,13,0,205,204,1,0,0,0,205,206,1,0,0,0,206,208,1,0,0,0,207,
+		121,1,0,0,0,207,124,1,0,0,0,207,129,1,0,0,0,207,137,1,0,0,0,207,153,1,
+		0,0,0,207,159,1,0,0,0,207,170,1,0,0,0,207,177,1,0,0,0,207,184,1,0,0,0,
+		207,195,1,0,0,0,207,199,1,0,0,0,207,201,1,0,0,0,207,202,1,0,0,0,207,203,
+		1,0,0,0,208,17,1,0,0,0,209,212,3,20,10,0,210,212,3,22,11,0,211,209,1,0,
+		0,0,211,210,1,0,0,0,212,19,1,0,0,0,213,214,5,26,0,0,214,215,3,26,13,0,
+		215,216,5,2,0,0,216,217,3,16,8,0,217,21,1,0,0,0,218,219,5,27,0,0,219,220,
+		5,2,0,0,220,221,3,16,8,0,221,23,1,0,0,0,222,227,3,4,2,0,223,224,3,26,13,
+		0,224,225,5,17,0,0,225,227,1,0,0,0,226,222,1,0,0,0,226,223,1,0,0,0,227,
+		25,1,0,0,0,228,229,6,13,-1,0,229,230,5,31,0,0,230,310,3,26,13,28,231,232,
+		5,32,0,0,232,310,3,26,13,27,233,234,5,49,0,0,234,235,3,6,3,0,235,236,5,
+		13,0,0,236,241,3,26,13,0,237,238,5,16,0,0,238,240,3,26,13,0,239,237,1,
+		0,0,0,240,243,1,0,0,0,241,239,1,0,0,0,241,242,1,0,0,0,242,244,1,0,0,0,
+		243,241,1,0,0,0,244,245,5,14,0,0,245,310,1,0,0,0,246,247,5,50,0,0,247,
+		248,3,6,3,0,248,249,5,13,0,0,249,254,3,32,16,0,250,251,5,16,0,0,251,253,
+		3,32,16,0,252,250,1,0,0,0,253,256,1,0,0,0,254,252,1,0,0,0,254,255,1,0,
+		0,0,255,257,1,0,0,0,256,254,1,0,0,0,257,258,5,14,0,0,258,310,1,0,0,0,259,
+		260,5,53,0,0,260,261,5,11,0,0,261,262,3,26,13,0,262,263,5,16,0,0,263,264,
+		3,26,13,0,264,265,5,12,0,0,265,310,1,0,0,0,266,267,5,54,0,0,267,268,5,
+		11,0,0,268,269,3,26,13,0,269,270,5,16,0,0,270,271,3,26,13,0,271,272,5,
+		12,0,0,272,310,1,0,0,0,273,274,5,55,0,0,274,275,5,11,0,0,275,276,3,26,
+		13,0,276,277,5,12,0,0,277,310,1,0,0,0,278,279,5,56,0,0,279,280,5,11,0,
+		0,280,281,3,26,13,0,281,282,5,16,0,0,282,287,3,26,13,0,283,284,5,16,0,
+		0,284,286,3,26,13,0,285,283,1,0,0,0,286,289,1,0,0,0,287,285,1,0,0,0,287,
+		288,1,0,0,0,288,290,1,0,0,0,289,287,1,0,0,0,290,291,5,12,0,0,291,310,1,
+		0,0,0,292,310,5,60,0,0,293,310,5,61,0,0,294,310,5,62,0,0,295,310,5,59,
+		0,0,296,310,5,63,0,0,297,298,5,57,0,0,298,299,5,65,0,0,299,301,5,11,0,
+		0,300,302,3,30,15,0,301,300,1,0,0,0,301,302,1,0,0,0,302,303,1,0,0,0,303,
+		310,5,12,0,0,304,310,5,65,0,0,305,306,5,11,0,0,306,307,3,26,13,0,307,308,
+		5,12,0,0,308,310,1,0,0,0,309,228,1,0,0,0,309,231,1,0,0,0,309,233,1,0,0,
+		0,309,246,1,0,0,0,309,259,1,0,0,0,309,266,1,0,0,0,309,273,1,0,0,0,309,
+		278,1,0,0,0,309,292,1,0,0,0,309,293,1,0,0,0,309,294,1,0,0,0,309,295,1,
+		0,0,0,309,296,1,0,0,0,309,297,1,0,0,0,309,304,1,0,0,0,309,305,1,0,0,0,
+		310,362,1,0,0,0,311,312,10,25,0,0,312,313,7,1,0,0,313,361,3,26,13,26,314,
+		315,10,24,0,0,315,316,7,2,0,0,316,361,3,26,13,25,317,318,10,23,0,0,318,
+		319,7,3,0,0,319,361,3,26,13,24,320,321,10,22,0,0,321,322,7,4,0,0,322,361,
+		3,26,13,23,323,324,10,21,0,0,324,325,7,5,0,0,325,361,3,26,13,22,326,327,
+		10,20,0,0,327,328,7,6,0,0,328,361,3,26,13,21,329,330,10,19,0,0,330,331,
+		7,7,0,0,331,361,3,26,13,20,332,334,10,26,0,0,333,335,3,28,14,0,334,333,
+		1,0,0,0,335,336,1,0,0,0,336,334,1,0,0,0,336,337,1,0,0,0,337,361,1,0,0,
+		0,338,339,10,18,0,0,339,361,7,8,0,0,340,341,10,15,0,0,341,342,5,51,0,0,
+		342,343,3,26,13,0,343,344,5,52,0,0,344,345,5,51,0,0,345,346,3,26,13,0,
+		346,347,5,52,0,0,347,361,1,0,0,0,348,349,10,14,0,0,349,350,5,51,0,0,350,
+		351,3,26,13,0,351,352,5,52,0,0,352,361,1,0,0,0,353,354,10,13,0,0,354,355,
+		5,51,0,0,355,356,3,26,13,0,356,357,5,2,0,0,357,358,3,26,13,0,358,359,5,
+		52,0,0,359,361,1,0,0,0,360,311,1,0,0,0,360,314,1,0,0,0,360,317,1,0,0,0,
+		360,320,1,0,0,0,360,323,1,0,0,0,360,326,1,0,0,0,360,329,1,0,0,0,360,332,
+		1,0,0,0,360,338,1,0,0,0,360,340,1,0,0,0,360,348,1,0,0,0,360,353,1,0,0,
+		0,361,364,1,0,0,0,362,360,1,0,0,0,362,363,1,0,0,0,363,27,1,0,0,0,364,362,
+		1,0,0,0,365,367,5,11,0,0,366,368,3,30,15,0,367,366,1,0,0,0,367,368,1,0,
+		0,0,368,369,1,0,0,0,369,373,5,12,0,0,370,371,5,58,0,0,371,373,5,65,0,0,
+		372,365,1,0,0,0,372,370,1,0,0,0,373,29,1,0,0,0,374,379,3,26,13,0,375,376,
+		5,16,0,0,376,378,3,26,13,0,377,375,1,0,0,0,378,381,1,0,0,0,379,377,1,0,
+		0,0,379,380,1,0,0,0,380,31,1,0,0,0,381,379,1,0,0,0,382,383,5,13,0,0,383,
+		388,3,26,13,0,384,385,5,16,0,0,385,387,3,26,13,0,386,384,1,0,0,0,387,390,
+		1,0,0,0,388,386,1,0,0,0,388,389,1,0,0,0,389,391,1,0,0,0,390,388,1,0,0,
+		0,391,392,5,14,0,0,392,33,1,0,0,0,33,37,45,53,62,70,77,88,95,102,116,119,
+		126,133,146,151,165,190,205,207,211,226,241,254,287,301,309,336,360,362,
+		367,372,379,388
 	};
 
 	public static readonly ATN _ATN =
