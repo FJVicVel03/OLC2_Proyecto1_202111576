@@ -280,6 +280,13 @@ public interface ILanguageVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitInt([NotNull] LanguageParser.IntContext context);
 	/// <summary>
+	/// Visit a parse tree produced by the <c>ParseFloatCall</c>
+	/// labeled alternative in <see cref="LanguageParser.expr"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitParseFloatCall([NotNull] LanguageParser.ParseFloatCallContext context);
+	/// <summary>
 	/// Visit a parse tree produced by the <c>LenCall</c>
 	/// labeled alternative in <see cref="LanguageParser.expr"/>.
 	/// </summary>

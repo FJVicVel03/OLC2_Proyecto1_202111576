@@ -65,6 +65,7 @@ expr:
 	| 'len' '(' expr ')' #LenCall
 	| 'append' '(' expr ',' expr (',' expr)* ')' #AppendCall
 	| 'strconv.Atoi' '(' expr ')' #AtoiCall
+	| 'strconv.ParseFloat' '(' expr ')' #ParseFloatCall
 	| BOOL							# Boolean
 	| FLOAT						# Float
 	| STRING						# String

@@ -1245,4 +1245,32 @@ public override ValueWrapper VisitRune(LanguageParser.RuneContext context)
         }
     }
 
+    public override ValueWrapper VisitParseFloatCall(LanguageParser.ParseFloatCallContext context)
+    {
+        // Obtener el primer argumento que es la cadena a convertir
+        var arg = Visit(context.expr());
+        
+        // Verificar que el argumento sea un string
+        if (arg is not StringValue strValue)
+        {
+            throw new SemanticError("strconv.ParseFloat expects a string argument", context.Start);
+        }
+
+        // Remover las comillas del string
+        var strNumber = strValue.Value.Trim('"');
+
+        // Intentar convertir a float
+        if (float.TryParse(strNumber, 
+            NumberStyles.Float | NumberStyles.AllowDecimalPoint, 
+            CultureInfo.InvariantCulture, 
+            out float result))
+        {
+            return new FloatValue(result);
+        }
+        else
+        {
+            throw new SemanticError($"strconv.ParseFloat: invalid float format in \"{strNumber}\"", context.Start);
+        }
+    }
+
 }
