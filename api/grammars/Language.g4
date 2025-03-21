@@ -64,6 +64,7 @@ expr:
 	| 'strings.Join' '(' expr ',' expr ')' #StringsJoinCall
 	| 'len' '(' expr ')' #LenCall
 	| 'append' '(' expr ',' expr (',' expr)* ')' #AppendCall
+	| 'strconv.Atoi' '(' expr ')' #AtoiCall
 	| BOOL							# Boolean
 	| FLOAT						# Float
 	| STRING						# String

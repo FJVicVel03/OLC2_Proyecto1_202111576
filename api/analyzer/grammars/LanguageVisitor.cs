@@ -385,6 +385,13 @@ public interface ILanguageVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitNegate([NotNull] LanguageParser.NegateContext context);
 	/// <summary>
+	/// Visit a parse tree produced by the <c>AtoiCall</c>
+	/// labeled alternative in <see cref="LanguageParser.expr"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitAtoiCall([NotNull] LanguageParser.AtoiCallContext context);
+	/// <summary>
 	/// Visit a parse tree produced by the <c>AppendCall</c>
 	/// labeled alternative in <see cref="LanguageParser.expr"/>.
 	/// </summary>

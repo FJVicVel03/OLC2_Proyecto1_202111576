@@ -1215,4 +1215,34 @@ public override ValueWrapper VisitRune(LanguageParser.RuneContext context)
         return matrixValue.GetValue(rowIndex.Value, colIndex.Value);
     }
 
+    public override ValueWrapper VisitAtoiCall(LanguageParser.AtoiCallContext context)
+    {
+        var arg = Visit(context.expr());
+        
+        // Verificar que el argumento sea un string
+        if (arg is not StringValue strValue)
+        {
+            throw new SemanticError("strconv.Atoi expects a string argument", context.Start);
+        }
+
+        // Remover las comillas del string
+        var strNumber = strValue.Value.Trim('"');
+
+        // Verificar que no sea un número decimal
+        if (strNumber.Contains('.'))
+        {
+            throw new SemanticError("strconv.Atoi cannot convert decimal numbers", context.Start);
+        }
+
+        // Intentar convertir a entero
+        if (int.TryParse(strNumber, out int result))
+        {
+            return new IntValue(result);
+        }
+        else
+        {
+            throw new SemanticError($"strconv.Atoi: invalid integer format in \"{strNumber}\"", context.Start);
+        }
+    }
+
 }
