@@ -1028,5 +1028,36 @@ public override ValueWrapper VisitRune(LanguageParser.RuneContext context)
 
         return new IntValue(-1); // Retorna -1 si no se encuentra
     }
+
+    public override ValueWrapper VisitStringsJoinCall(LanguageParser.StringsJoinCallContext context)
+    {
+        // Obtener los argumentos de la función
+        var slice = Visit(context.expr(0));
+        var separator = Visit(context.expr(1));
+
+        // Verificar que el primer argumento sea un slice de cadenas
+        if (slice is not SliceValue sliceValue || sliceValue.Type != "string")
+        {
+            throw new SemanticError("The first argument to strings.Join must be a slice of strings ([]string)", context.Start);
+        }
+
+        // Verificar que el segundo argumento sea una cadena
+        if (separator is not StringValue separatorValue)
+        {
+            throw new SemanticError("The second argument to strings.Join must be a string", context.Start);
+        }
+
+        // Unir los elementos del slice con el separador
+        var joinedString = string.Join(separatorValue.Value, sliceValue.Elements.Select(e =>
+        {
+            if (e is not StringValue stringValue)
+            {
+                throw new SemanticError("All elements in the slice must be strings", context.Start);
+            }
+            return stringValue.Value;
+        }));
+
+        return new StringValue(joinedString);
+    }
     
 }
