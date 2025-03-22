@@ -1017,30 +1017,50 @@ public override ValueWrapper VisitRune(LanguageParser.RuneContext context)
     //VisitForConditionStmt
     public override ValueWrapper VisitForConditionStmt(LanguageParser.ForConditionStmtContext context)
     {
-    // Evaluar la condición inicial
-    ValueWrapper condition = Visit(context.expr());
-    if (condition is not BoolValue)
-    {
-        throw new SemanticError("Invalid condition in for loop", context.Start);
-    }
+        Environment previousEnvironment = currentEnvironment;
+        currentEnvironment = new Environment(currentEnvironment);
 
-    // Ejecutar el cuerpo del bucle mientras la condición sea verdadera
-    while (((BoolValue)condition).Value)
-    {
-        foreach (var stmt in context.stmt())
+        try
         {
-            Visit(stmt);
+            while (true)  // Si no hay condición, es un bucle infinito
+            {
+                // Si hay una condición, evaluarla
+                if (context.expr() != null)
+                {
+                    var condition = Visit(context.expr());
+                    if (condition is not BoolValue boolCondition)
+                    {
+                        throw new SemanticError("For condition must be boolean", context.Start);
+                    }
+                    if (!boolCondition.Value)
+                    {
+                        break;
+                    }
+                }
+
+                try
+                {
+                    foreach (var stmt in context.stmt())
+                    {
+                        Visit(stmt);
+                    }
+                }
+                catch (BreakException)
+                {
+                    break;
+                }
+                catch (ContinueException)
+                {
+                    continue;
+                }
+            }
+        }
+        finally
+        {
+            currentEnvironment = previousEnvironment;
         }
 
-        // Reevaluar la condición
-        condition = Visit(context.expr());
-        if (condition is not BoolValue)
-        {
-            throw new SemanticError("Invalid condition in for loop", context.Start);
-        }
-    }
-
-    return defaultValue;
+        return defaultValue;
     }
 
     //VisitIncDec

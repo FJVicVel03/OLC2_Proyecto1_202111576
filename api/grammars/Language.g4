@@ -27,7 +27,7 @@ expr  # ExprStmt
 | '{' dcl* '}' # BlockStmt
 | 'if'  expr  stmt ('else if' expr stmt)* ('else' stmt)? # IfStmt
 | 'while' '(' expr ')' stmt # WhileStmt
-| 'for' expr '{' stmt* '}' # ForConditionStmt // Variante condicional
+| 'for' (expr)? '{' stmt* '}' # ForConditionStmt // Variante condicional
 | 'for' ID ',' ID ':=' 'range' expr '{' stmt* '}' # ForRangeStmt
 | 'for'  forInit expr ';' expr  stmt # ForStmt
 | 'do' stmt 'while' '(' expr ')'  # DoWhileStmt
