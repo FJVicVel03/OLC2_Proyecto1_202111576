@@ -32,17 +32,15 @@ expr  # ExprStmt
 | 'for'  forInit expr ';' expr  stmt # ForStmt
 | 'do' stmt 'while' '(' expr ')'  # DoWhileStmt
 | 'switch'  expr  '{' switchCase* '}' # SwitchStmt
-| 'case' expr  stmt # CaseStatement
-| 'default'  stmt # DefaultCaseStmt
 | 'break'  # BreakStmt
 | 'continue'  # ContinueStmt
 | 'return' expr?  # ReturnStmt;
 
 switchCase: caseStmt | defaultStmt;
 
-caseStmt: 'case' expr ':' stmt;
+caseStmt: 'case' expr ':' stmt*;
 
-defaultStmt: 'default' ':' stmt;
+defaultStmt: 'default' ':' stmt*;
 
 forInit: varDcl | expr ';'; 
 

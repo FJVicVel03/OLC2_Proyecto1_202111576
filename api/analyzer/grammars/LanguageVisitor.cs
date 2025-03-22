@@ -157,20 +157,6 @@ public interface ILanguageVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitSwitchStmt([NotNull] LanguageParser.SwitchStmtContext context);
 	/// <summary>
-	/// Visit a parse tree produced by the <c>CaseStatement</c>
-	/// labeled alternative in <see cref="LanguageParser.stmt"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitCaseStatement([NotNull] LanguageParser.CaseStatementContext context);
-	/// <summary>
-	/// Visit a parse tree produced by the <c>DefaultCaseStmt</c>
-	/// labeled alternative in <see cref="LanguageParser.stmt"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitDefaultCaseStmt([NotNull] LanguageParser.DefaultCaseStmtContext context);
-	/// <summary>
 	/// Visit a parse tree produced by the <c>BreakStmt</c>
 	/// labeled alternative in <see cref="LanguageParser.stmt"/>.
 	/// </summary>

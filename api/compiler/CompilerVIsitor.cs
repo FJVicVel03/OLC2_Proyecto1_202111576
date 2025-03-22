@@ -942,18 +942,24 @@ public override ValueWrapper VisitRune(LanguageParser.RuneContext context)
             {
                 var caseStmt = switchCase.caseStmt();
                 ValueWrapper caseValue = Visit(caseStmt.expr());
+                
+                // Si el caso coincide, ejecutar todos sus statements
                 if (switchValue.Equals(caseValue))
                 {
                     caseMatched = true;
-                    Visit(caseStmt.stmt());
+                    foreach (var stmt in caseStmt.stmt())
+                    {
+                        Visit(stmt);
+                    }
                     break;
                 }
             }
-            else if (switchCase.defaultStmt() != null) // Caso por defecto
+            else if (switchCase.defaultStmt() != null && !caseMatched) // Caso por defecto
             {
-                if (!caseMatched) // Solo ejecutar si no se ha encontrado un caso coincidente
+                var defaultStmt = switchCase.defaultStmt();
+                foreach (var stmt in defaultStmt.stmt())
                 {
-                    Visit(switchCase.defaultStmt().stmt());
+                    Visit(stmt);
                 }
             }
         }
@@ -971,10 +977,13 @@ public override ValueWrapper VisitRune(LanguageParser.RuneContext context)
     public override ValueWrapper VisitCaseStmt(LanguageParser.CaseStmtContext context)
     {
         var caseValue = Visit(context.expr());
-        if (EvaluateCase(caseValue))
+        
+        // Ejecutar todas las instrucciones del case
+        foreach (var stmt in context.stmt())
         {
-            return Visit(context.stmt());
+            Visit(stmt);
         }
+        
         return defaultValue;
     }
 
