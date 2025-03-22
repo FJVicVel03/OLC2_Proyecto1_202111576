@@ -12,7 +12,7 @@ type: 'int' | 'float' | 'bool' | 'string' | 'rune' | ID;
 
 funcDcl: 'func' ID '(' params? ')' '{' dcl* '}' ;
 
-structDcl: 'struct' ID '{' structBody* '}' ;
+structDcl: 'type' ID 'struct' '{' structBody* '}' ;
 
 structBody: ID ':' type ;
 

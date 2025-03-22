@@ -932,33 +932,30 @@ public override ValueWrapper VisitRune(LanguageParser.RuneContext context)
     {
         var output = "";
 
-        // Si hay argumentos, procesarlos
         if (context.args() != null)
         {
             foreach (var arg in context.args().expr())
             {
                 var value = Visit(arg);
 
-                // Convertir el valor a cadena según su tipo
                 output += value switch
                 {
                     IntValue i => i.Value.ToString(),
                     FloatValue f => f.Value.ToString(CultureInfo.InvariantCulture),
                     StringValue s => s.Value,
                     BoolValue b => b.Value.ToString(),
-                    SliceValue slice => $"[{string.Join(", ", slice.Elements.Select(e => ConvertElementToString(e)))}]", // Manejar SliceValue
-                    MultiSliceValue multiSlice => $"[{string.Join(", ", multiSlice.Elements.Select(e => $"[{string.Join(", ", e.Select(e => ConvertElementToString(e)))}]"))}]", // Manejar MultiSliceValue
+                    SliceValue slice => $"[{string.Join(", ", slice.Elements.Select(e => ConvertElementToString(e)))}]",
+                    MultiDimSliceValue multiSlice => $"[{string.Join(", ", multiSlice.Elements.Select(row => 
+                        $"[{string.Join(", ", row.Select(e => ConvertElementToString(e)))}]"))}]",
                     VoidValue _ => "void",
                     _ => throw new SemanticError($"Unsupported type in fmt.Println: {value.GetType().Name}", context.Start)
                 };
 
-                output += " "; // Agregar un espacio entre los argumentos
+                output += " ";
             }
         }
 
-        // Acumular el resultado en la propiedad `output` para el frontend
         this.output += output.TrimEnd() + "\n";
-
         return defaultValue;
     }
 
@@ -1156,25 +1153,45 @@ public override ValueWrapper VisitRune(LanguageParser.RuneContext context)
 
     public override ValueWrapper VisitSliceAccess(LanguageParser.SliceAccessContext context)
     {
-        var slice = Visit(context.expr(0)); // Obtener el slice
+        var slice = Visit(context.expr(0)); // Obtener el slice o matriz
         var index = Visit(context.expr(1)); // Obtener el índice
 
-        if (slice is not SliceValue sliceValue)
+        // Manejar acceso a matrices bidimensionales
+        if (slice is MultiDimSliceValue matrixValue)
         {
-            throw new SemanticError("The variable is not a slice", context.Start);
-        }
+            if (index is not IntValue rowIndex)
+            {
+                throw new SemanticError("Matrix row index must be an integer", context.Start);
+            }
 
-        if (index is not IntValue intIndex)
+            if (rowIndex.Value < 0 || rowIndex.Value >= matrixValue.Elements.Count)
+            {
+                throw new SemanticError("Row index out of bounds", context.Start);
+            }
+
+            // Devolver la fila como un nuevo slice
+            var row = matrixValue.Elements[rowIndex.Value];
+            return new SliceValue(matrixValue.Type, row);
+        }
+        // Manejar acceso a slices normales
+        else if (slice is SliceValue sliceValue)
         {
-            throw new SemanticError("The index must be an integer", context.Start);
-        }
+            if (index is not IntValue intIndex)
+            {
+                throw new SemanticError("The index must be an integer", context.Start);
+            }
 
-        if (intIndex.Value < 0 || intIndex.Value >= sliceValue.Elements.Count)
+            if (intIndex.Value < 0 || intIndex.Value >= sliceValue.Elements.Count)
+            {
+                throw new SemanticError("Index out of bounds", context.Start);
+            }
+
+            return sliceValue.Elements[intIndex.Value];
+        }
+        else
         {
-            throw new SemanticError("Index out of bounds", context.Start);
+            throw new SemanticError("The variable is not a slice or matrix", context.Start);
         }
-
-        return sliceValue.Elements[intIndex.Value];
     }
 
     public override ValueWrapper VisitSliceRange(LanguageParser.SliceRangeContext context)
@@ -1274,34 +1291,59 @@ public override ValueWrapper VisitRune(LanguageParser.RuneContext context)
 
     public override ValueWrapper VisitAppendCall(LanguageParser.AppendCallContext context)
     {
-        // Obtener el slice al que se le agregarán elementos
-        var slice = Visit(context.expr(0));
-
-        // Verificar que el primer argumento sea un slice
-        if (slice is not SliceValue sliceValue)
+        // Obtener el slice base
+        var baseSlice = Visit(context.expr(0));
+        
+        // Si es un slice normal
+        if (baseSlice is SliceValue sliceValue)
+        {
+            List<ValueWrapper> elements = new List<ValueWrapper>(sliceValue.Elements);
+            
+            // Agregar cada elemento nuevo
+            for (int i = 1; i < context.expr().Length; i++)
+            {
+                var newValue = Visit(context.expr(i));
+                if (!IsTypeCompatible(sliceValue.Type, newValue))
+                {
+                    throw new SemanticError($"Cannot append value of type {newValue.GetType().Name} to slice of type {sliceValue.Type}", context.Start);
+                }
+                elements.Add(newValue);
+            }
+            
+            return new SliceValue(sliceValue.Type, elements);
+        }
+        // Si es una matriz (slice bidimensional)
+        else if (baseSlice is MultiDimSliceValue matrixValue)
+        {
+            var elements = new List<List<ValueWrapper>>(matrixValue.Elements);
+            
+            // Para cada nuevo elemento a agregar
+            for (int i = 1; i < context.expr().Length; i++)
+            {
+                var newValue = Visit(context.expr(i));
+                
+                // Si es un slice, lo agregamos como nueva fila
+                if (newValue is SliceValue newSlice)
+                {
+                    // Verificar que el tipo sea compatible
+                    if (newSlice.Type != matrixValue.Type)
+                    {
+                        throw new SemanticError($"Cannot append slice of type {newSlice.Type} to matrix of type {matrixValue.Type}", context.Start);
+                    }
+                    elements.Add(new List<ValueWrapper>(newSlice.Elements));
+                }
+                else
+                {
+                    throw new SemanticError("Can only append slices to a matrix", context.Start);
+                }
+            }
+            
+            return new MultiDimSliceValue(matrixValue.Type, elements);
+        }
+        else
         {
             throw new SemanticError("The first argument to append must be a slice", context.Start);
         }
-
-        // Crear una copia del slice original
-        var newElements = new List<ValueWrapper>(sliceValue.Elements);
-
-        // Agregar los elementos adicionales al slice
-        for (int i = 1; i < context.expr().Length; i++)
-        {
-            var element = Visit(context.expr(i));
-
-            // Verificar que el tipo del elemento sea compatible con el tipo del slice
-            if (!IsTypeCompatible(sliceValue.Type, element))
-            {
-                throw new SemanticError($"Cannot append element of type '{element.GetType().Name}' to slice of type '{sliceValue.Type}'", context.Start);
-            }
-
-            newElements.Add(element);
-        }
-
-        // Retornar un nuevo slice con los elementos añadidos
-        return new SliceValue(sliceValue.Type, newElements);
     }
             
         public override ValueWrapper VisitMultiDimSliceInit(LanguageParser.MultiDimSliceInitContext context)
