@@ -165,7 +165,7 @@ public override ValueWrapper VisitVarDcl(LanguageParser.VarDclContext context)
     return defaultValue;
 }
 
-    private bool IsTypeCompatible(string type, ValueWrapper value)
+    public bool IsTypeCompatible(string type, ValueWrapper value)
 {
     return type switch
     {
@@ -174,11 +174,11 @@ public override ValueWrapper VisitVarDcl(LanguageParser.VarDclContext context)
         "string" => value is StringValue,
         "bool" => value is BoolValue,
         "rune" => value is RuneValue,
-        _ => false
+        _ => value is StructValue structValue && structValue.Struct.Name == type // Para structs anidados
     };
 }
 
-    private ValueWrapper GetDefaultValue(string type)
+    public ValueWrapper GetDefaultValue(string type)
 {
     return type switch
     {
@@ -187,7 +187,12 @@ public override ValueWrapper VisitVarDcl(LanguageParser.VarDclContext context)
         "string" => new StringValue(""),
         "bool" => new BoolValue(false),
         "rune" => new RuneValue(0),
-        _ => throw new SemanticError($"Unknown type '{type}'", null)
+        _ => currentEnvironment.Get(type, null) is StructValue structValue ? 
+            new StructValue(structValue.Struct, 
+                structValue.Struct.Fields.ToDictionary(
+                    f => f.Key, 
+                    f => GetDefaultValue(f.Value))) 
+            : throw new SemanticError($"Unknown type '{type}'", null)
     };
 }
 
@@ -384,9 +389,59 @@ public override ValueWrapper VisitRune(LanguageParser.RuneContext context)
                             throw new SemanticError($"Error assigning to property '{propertyName}': {e.Message}", context.Start);
                         }
                     }
+                    else if (callee is StructValue structValue)
+                    {
+                        var fieldName = propertyAccess.ID().GetText();
+                        Console.WriteLine($"DEBUG: VisitAssign - Attempting to access field '{fieldName}'");
+                        Console.WriteLine($"DEBUG: VisitAssign - Current struct is {structValue.Struct.Name}");
+                        
+                        // Para accesos anidados, necesitamos navegar hasta el struct correcto
+                        StructValue currentStruct = structValue;
+
+                        // Procesar todos los accesos excepto el último
+                        for (int j = 0; j < i; j++)
+                        {
+                            var intermediateAccess = calleeContext.call(j);
+                            if (intermediateAccess is LanguageParser.GetContext getContext)
+                            {
+                                var intermediateField = getContext.ID().GetText();
+                                Console.WriteLine($"DEBUG: VisitAssign - Navigating through field '{intermediateField}'");
+                                
+                                if (!currentStruct.Struct.HasField(intermediateField))
+                                {
+                                    throw new SemanticError($"Struct {currentStruct.Struct.Name} does not have field '{intermediateField}'", getContext.Start);
+                                }
+
+                                var nextValue = currentStruct.Values[intermediateField];
+                                if (nextValue is not StructValue nextStruct)
+                                {
+                                    throw new SemanticError($"Field '{intermediateField}' is not a struct", getContext.Start);
+                                }
+                                
+                                currentStruct = nextStruct;
+                                Console.WriteLine($"DEBUG: VisitAssign - Updated current struct to {currentStruct.Struct.Name}");
+                            }
+                        }
+
+                        // Realizar la asignación en el último campo
+                        if (!currentStruct.Struct.HasField(fieldName))
+                        {
+                            throw new SemanticError($"Struct {currentStruct.Struct.Name} does not have field '{fieldName}'", propertyAccess.Start);
+                        }
+
+                        var fieldType = currentStruct.Struct.GetFieldType(fieldName);
+                        if (!IsTypeCompatible(fieldType, value))
+                        {
+                            throw new SemanticError($"Cannot assign value of type '{value.GetType().Name}' to field of type '{fieldType}'", context.Start);
+                        }
+
+                        currentStruct.Values[fieldName] = value;
+                        Console.WriteLine($"DEBUG: VisitAssign - Successfully assigned value to field '{fieldName}' in struct {currentStruct.Struct.Name}");
+                        return defaultValue;
+                    }
                     else
                     {
-                        throw new SemanticError("Invalid property access: Target is not an instance", context.Start);
+                        throw new SemanticError("Invalid property access: Target is not an instance or struct", context.Start);
                     }
                 }
                 else
@@ -635,28 +690,54 @@ public override ValueWrapper VisitRune(LanguageParser.RuneContext context)
     //VisitCallee
     public override ValueWrapper VisitCallee(LanguageParser.CalleeContext context)
     {
+        Console.WriteLine("DEBUG: Entering VisitCallee");
         ValueWrapper callee = Visit(context.expr());
+        Console.WriteLine($"DEBUG: Initial callee type is {callee.GetType().Name}");
 
-        foreach (var action in context.call()){
-            if(action is LanguageParser.FuncCallContext funcCall){
-                
-                if(callee is FunctionValue functionValue){
+        foreach (var action in context.call())
+        {
+            Console.WriteLine($"DEBUG: Processing action of type {action.GetType().Name}");
+            if (action is LanguageParser.FuncCallContext funcCall)
+            {
+                if (callee is FunctionValue functionValue)
+                {
                     callee = VisitCall(functionValue.invocable, funcCall.args());
                 }
                 else
                 {
                     throw new SemanticError("Invalid function call", context.Start);
                 }
-
-            }else if (action is LanguageParser.GetContext propertyAccess){
-                if(callee is InstanceValue instanceValue){
-                    callee = instanceValue.Instance.Get(propertyAccess.ID().GetText(), propertyAccess.Start); // Corregir error tipográfico
-                }else{
-                    throw new SemanticError("Invalid property access", context.Start);
+            }
+            else if (action is LanguageParser.GetContext propertyAccess)
+            {
+                var fieldName = propertyAccess.ID().GetText();
+                Console.WriteLine($"DEBUG: Attempting to access field '{fieldName}'");
+                
+                if (callee is InstanceValue instanceValue)
+                {
+                    callee = instanceValue.Instance.Get(propertyAccess.ID().GetText(), propertyAccess.Start);
+                }
+                else if (callee is StructValue structValue)
+                {
+                    Console.WriteLine($"DEBUG: Callee is a StructValue named {structValue.Struct.Name}");
+                    Console.WriteLine($"DEBUG: Available fields: {string.Join(", ", structValue.Struct.Fields.Keys)}");
+                    
+                    if (!structValue.Struct.HasField(fieldName))
+                    {
+                        Console.WriteLine($"DEBUG: Field '{fieldName}' not found in struct");
+                        throw new SemanticError($"Struct {structValue.Struct.Name} does not have field '{fieldName}'", propertyAccess.Start);
+                    }
+                    // Obtener el valor del campo y usarlo como el nuevo callee
+                    callee = structValue.Values[fieldName];
+                    Console.WriteLine($"DEBUG: Updated callee type to {callee.GetType().Name}");
+                }
+                else
+                {
+                    throw new SemanticError($"Cannot access field '{fieldName}' on {callee.GetType().Name}", propertyAccess.Start);
                 }
             }
         }
-        return callee; // Agregar retorno de callee
+        return callee;
     }
 
     public ValueWrapper VisitCall(Invocable invocable, LanguageParser.ArgsContext context)
@@ -687,26 +768,7 @@ public override ValueWrapper VisitRune(LanguageParser.RuneContext context)
     }
 
     //VisitClassDcl
-    public override ValueWrapper VisitClassDcl(LanguageParser.ClassDclContext context){
-        Dictionary<string, LanguageParser.VarDclContext> props = new Dictionary<string, LanguageParser.VarDclContext>();
-        Dictionary<string, ForeignFunction> methods = new Dictionary<string, ForeignFunction>();
-
-        foreach(var prop in context.classBody()){
-            if(prop.varDcl() != null){
-                var varDcl = prop.varDcl();
-                props.Add(varDcl.ID().GetText(), varDcl);
-            }else if(prop.funcDcl() != null){
-                var funcDcl = prop.funcDcl();
-                var foreignFunction = new ForeignFunction(currentEnvironment, funcDcl);
-                methods.Add(funcDcl.ID().GetText(), foreignFunction);
-            }
-        }
-
-        LanguageClass languageClass = new LanguageClass(context.ID().GetText(), props, methods);
-        currentEnvironment.Declare(context.ID().GetText(), new ClassValue(languageClass), context.Start);
-
-        return defaultValue;      
-    }
+    
 
     //VisitNew
     public override ValueWrapper VisitNew(LanguageParser.NewContext context)
@@ -1286,6 +1348,124 @@ public override ValueWrapper VisitRune(LanguageParser.RuneContext context)
         
         // Devolver el tipo como un string
         return new StringValue(type);
+    }
+
+    public override ValueWrapper VisitStructDcl(LanguageParser.StructDclContext context)
+    {
+        var structName = context.ID().GetText();
+        var fields = new Dictionary<string, string>();
+
+        // Verificar que tenga al menos un campo
+        if (context.structBody().Length == 0)
+        {
+            throw new SemanticError("Struct must have at least one field", context.Start);
+        }
+
+        // Procesar cada campo
+        foreach (var field in context.structBody())
+        {
+            var fieldName = field.ID().GetText();
+            var fieldType = field.type().GetText();
+            
+            // Verificar que el campo no esté duplicado
+            if (fields.ContainsKey(fieldName))
+            {
+                throw new SemanticError($"Duplicate field '{fieldName}' in struct", field.Start);
+            }
+
+            fields[fieldName] = fieldType;
+        }
+
+        // Crear y guardar el struct en el entorno global
+        var languageStruct = new LanguageStruct(structName);
+        foreach (var field in fields)
+        {
+            languageStruct.AddField(field.Key, field.Value);
+        }
+        
+        // Crear un StructValue inicial con valores por defecto
+        var defaultValues = new Dictionary<string, ValueWrapper>();
+        foreach (var field in fields)
+        {
+            defaultValues[field.Key] = GetDefaultValue(field.Value);
+        }
+        
+        // Agregar el struct al entorno como un StructValue
+        currentEnvironment.Declare(structName, new StructValue(languageStruct, defaultValues), context.Start);
+
+        return defaultValue;
+    }
+
+    public override ValueWrapper VisitStructInit(LanguageParser.StructInitContext context)
+    {
+        var structName = context.ID().GetText();
+        var structDef = currentEnvironment.Get(structName, context.Start);
+
+        if (structDef is not StructValue structValue)
+        {
+            throw new SemanticError($"'{structName}' is not a struct", context.Start);
+        }
+
+        var values = new Dictionary<string, ValueWrapper>();
+
+        // Process each field initializer
+        foreach (var field in context.structField())
+        {
+            var fieldName = field.ID().GetText();
+            var fieldValue = Visit(field.expr());
+
+            if (!structValue.Struct.HasField(fieldName))
+            {
+                throw new SemanticError($"Unknown field '{fieldName}' in struct '{structName}'", field.Start);
+            }
+
+            var fieldType = structValue.Struct.GetFieldType(fieldName);
+            if (!IsTypeCompatible(fieldType, fieldValue))
+            {
+                throw new SemanticError($"Type mismatch for field '{fieldName}': expected {fieldType}", field.Start);
+            }
+
+            values[fieldName] = fieldValue;
+        }
+
+        // Check all fields are initialized or set defaults
+        foreach (var field in structValue.Struct.Fields)
+        {
+            if (!values.ContainsKey(field.Key))
+            {
+                values[field.Key] = GetDefaultValue(field.Value);
+            }
+        }
+
+        return new StructValue(structValue.Struct, values);
+    }
+
+    public override ValueWrapper VisitStructAccess(LanguageParser.StructAccessContext context)
+    {
+        Console.WriteLine($"DEBUG: Entering VisitStructAccess");
+        var target = Visit(context.expr());
+        Console.WriteLine($"DEBUG: Target type is {target.GetType().Name}");
+        var fieldName = context.ID().GetText();
+        Console.WriteLine($"DEBUG: Trying to access field '{fieldName}'");
+
+        if (target is not StructValue structValue)
+        {
+            Console.WriteLine($"DEBUG: Target is not a StructValue, it's a {target.GetType().Name}");
+            throw new SemanticError($"Cannot access field '{fieldName}' on non-struct value", context.Start);
+        }
+
+        Console.WriteLine($"DEBUG: Struct name is {structValue.Struct.Name}");
+        Console.WriteLine($"DEBUG: Available fields: {string.Join(", ", structValue.Struct.Fields.Keys)}");
+
+        if (!structValue.Struct.HasField(fieldName))
+        {
+            Console.WriteLine($"DEBUG: Field '{fieldName}' not found in struct");
+            throw new SemanticError($"Struct does not have field '{fieldName}'", context.ID().Symbol);
+        }
+
+        var value = structValue.Values[fieldName];
+        Console.WriteLine($"DEBUG: Successfully retrieved field value of type {value.GetType().Name}");
+        return value;
     }
 
 }

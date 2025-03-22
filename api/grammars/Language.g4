@@ -2,19 +2,19 @@ grammar Language;
 
 program: dcl*;
 
-dcl: varDcl | stmt | funcDcl | classDcl |expr;
+dcl: varDcl | stmt | funcDcl | structDcl |expr;
 
 varDcl: 'var' ID ':' type ('=' expr)?    
 		| 'var' ID '=' expr
 		| ID ':=' expr;
 
-type: 'int' | 'float' | 'bool' | 'string' | 'rune';
+type: 'int' | 'float' | 'bool' | 'string' | 'rune' | ID;
 
 funcDcl: 'func' ID '(' params? ')' '{' dcl* '}' ;
 
-classDcl: 'class' ID '{' classBody* '}' ;
+structDcl: 'struct' ID '{' structBody* '}' ;
 
-classBody: varDcl | funcDcl;
+structBody: ID ':' type ';' ;
 
 params: ID (',' ID)*
 		| 'var' ID ':' type (',' 'var' ID':' type)*;
@@ -67,6 +67,8 @@ expr:
 	| 'strconv.Atoi' '(' expr ')' #AtoiCall
 	| 'strconv.ParseFloat' '(' expr ')' #ParseFloatCall
 	| 'reflect.TypeOf' '(' expr ')' #TypeOfCall
+	| ID '{' structField (',' structField)* '}' #StructInit
+	| expr '.' ID # StructAccess
 	| BOOL							# Boolean
 	| FLOAT						# Float
 	| STRING						# String
@@ -79,6 +81,7 @@ expr:
 call: '(' args? ')' # FuncCall | '.' ID # Get; 
 args: expr (',' expr)*;	
 matrixRow: '{' expr (',' expr)* '}';
+structField: ID ':' expr;
 
 INT: [0-9]+;
 BOOL: 'true' | 'false';

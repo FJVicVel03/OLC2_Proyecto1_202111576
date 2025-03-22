@@ -15,6 +15,31 @@ public record InstanceValue(Instance Instance) : ValueWrapper;
 
 public record ClassValue(LanguageClass languageClass) : ValueWrapper;
 
+
+public record StructValue(LanguageStruct Struct, Dictionary<string, ValueWrapper> Values) : ValueWrapper
+{
+    public StructValue Parent { get; set; }
+    public string FieldName { get; set; }
+
+    public void UpdateField(string fieldPath, ValueWrapper value)
+    {
+        var parts = fieldPath.Split('.');
+        if (parts.Length == 1)
+        {
+            Values[fieldPath] = value;
+        }
+        else
+        {
+            var current = Values[parts[0]] as StructValue;
+            for (int i = 1; i < parts.Length - 1; i++)
+            {
+                current = current.Values[parts[i]] as StructValue;
+            }
+            current.Values[parts[parts.Length - 1]] = value;
+        }
+    }
+}
+
 public record RuneValue(byte Value) : ValueWrapper
 {
     public override global::System.String ToString()
