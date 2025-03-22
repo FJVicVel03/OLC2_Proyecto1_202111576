@@ -356,6 +356,13 @@ public interface ILanguageVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitStructInit([NotNull] LanguageParser.StructInitContext context);
 	/// <summary>
+	/// Visit a parse tree produced by the <c>NilExpr</c>
+	/// labeled alternative in <see cref="LanguageParser.expr"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitNilExpr([NotNull] LanguageParser.NilExprContext context);
+	/// <summary>
 	/// Visit a parse tree produced by the <c>AddSub</c>
 	/// labeled alternative in <see cref="LanguageParser.expr"/>.
 	/// </summary>

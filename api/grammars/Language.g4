@@ -14,7 +14,7 @@ funcDcl: 'func' ID '(' params? ')' '{' dcl* '}' ;
 
 structDcl: 'type' ID 'struct' '{' structBody* '}' ;
 
-structBody: ID ':' type ;
+structBody: ID  type ;
 
 structFuncDcl: 'func' '(' ID ID ')' ID '(' params? ')' type? stmt;
 
@@ -70,6 +70,7 @@ expr:
 	| 'reflect.TypeOf' '(' expr ')' #TypeOfCall
 	| ID '{' structField (',' structField)* '}' #StructInit
 	| expr '.' ID # StructAccess
+	| 'nil'                          # NilExpr
 	| BOOL							# Boolean
 	| FLOAT						# Float
 	| STRING						# String

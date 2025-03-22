@@ -947,6 +947,7 @@ public override ValueWrapper VisitRune(LanguageParser.RuneContext context)
                     SliceValue slice => $"[{string.Join(", ", slice.Elements.Select(e => ConvertElementToString(e)))}]",
                     MultiDimSliceValue multiSlice => $"[{string.Join(", ", multiSlice.Elements.Select(row => 
                         $"[{string.Join(", ", row.Select(e => ConvertElementToString(e)))}]"))}]",
+                    StructValue structValue => $"{{{string.Join(", ", structValue.Values.Select(kv => $"{kv.Key}: {ConvertElementToString(kv.Value)}"))}}}",    
                     VoidValue _ => "void",
                     _ => throw new SemanticError($"Unsupported type in fmt.Println: {value.GetType().Name}", context.Start)
                 };
@@ -962,6 +963,11 @@ public override ValueWrapper VisitRune(LanguageParser.RuneContext context)
     // Método auxiliar para convertir elementos del slice a cadenas
     private string ConvertElementToString(ValueWrapper element)
     {
+        if(element == null || element is NullValue)
+        {
+            return "nil";
+        }
+
         return element switch
         {
             IntValue i => i.Value.ToString(),
@@ -1649,6 +1655,11 @@ public override ValueWrapper VisitRune(LanguageParser.RuneContext context)
         }
 
         return defaultValue;
+    }
+
+    public override ValueWrapper VisitNilExpr(LanguageParser.NilExprContext context)
+    {
+        return NullValue.Instance;
     }
 
 }

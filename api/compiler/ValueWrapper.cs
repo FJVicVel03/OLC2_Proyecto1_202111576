@@ -96,5 +96,22 @@ public record MultiDimSliceValue(string Type, List<List<ValueWrapper>> Elements)
 
 public record VoidValue : ValueWrapper;
 
+public record NullValue : ValueWrapper 
+{
+    private static NullValue instance;
+    
+    private NullValue() { }
+    
+    public static NullValue Instance 
+    {
+        get 
+        {
+            instance ??= new NullValue();
+            return instance;
+        }
+    }
+
+    public override string ToString() => "nil";
+}
 
 
