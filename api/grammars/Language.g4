@@ -2,7 +2,7 @@ grammar Language;
 
 program: dcl*;
 
-dcl: varDcl | stmt | funcDcl | structDcl |expr;
+dcl: varDcl | stmt | funcDcl | structDcl | structFuncDcl | expr;
 
 varDcl: 'var' ID ':' type ('=' expr)?    
 		| 'var' ID '=' expr
@@ -14,7 +14,9 @@ funcDcl: 'func' ID '(' params? ')' '{' dcl* '}' ;
 
 structDcl: 'struct' ID '{' structBody* '}' ;
 
-structBody: ID ':' type ';' ;
+structBody: ID ':' type ;
+
+structFuncDcl: 'func' '(' ID ID ')' ID '(' params? ')' type? stmt;
 
 params: ID (',' ID)*
 		| 'var' ID ':' type (',' 'var' ID':' type)*;
@@ -78,7 +80,7 @@ expr:
 	| ID							# Identifier
 	| '(' expr ')'			# Parens;
 	
-call: '(' args? ')' # FuncCall | '.' ID # Get; 
+call: '(' args? ')' # FuncCall | '.' ID # Get | '.' ID '(' args? ')' # StructFuncCall;
 args: expr (',' expr)*;	
 matrixRow: '{' expr (',' expr)* '}';
 structField: ID ':' expr;
