@@ -665,7 +665,22 @@ public override ValueWrapper VisitRune(LanguageParser.RuneContext context)
     //VisitBreakStmt
     public override ValueWrapper VisitBreakStmt(LanguageParser.BreakStmtContext context)
     {
-        throw new BreakException();
+        // Verificar si estamos dentro de un switch o un bucle
+        var node = context.Parent;
+        while (node != null)
+        {
+            if (node is LanguageParser.SwitchStmtContext || 
+                node is LanguageParser.ForStmtContext || 
+                node is LanguageParser.WhileStmtContext ||
+                node is LanguageParser.ForRangeStmtContext ||
+                node is LanguageParser.ForConditionStmtContext)
+            {
+                throw new BreakException();
+            }
+            node = node.Parent;
+        }
+        
+        throw new SemanticError("Break statement outside loop or switch", context.Start);
     }
 
     //VisitContinueStmt
@@ -931,41 +946,53 @@ public override ValueWrapper VisitRune(LanguageParser.RuneContext context)
         //SwitchStmt CaseStatement DefaultCaseStmt
 
         public override ValueWrapper VisitSwitchStmt(LanguageParser.SwitchStmtContext context)
-    {
-        ValueWrapper switchValue = Visit(context.expr());
-        bool caseMatched = false;
-
-        // Iterar sobre los casos del switch
-        foreach (var switchCase in context.switchCase())
         {
-            if (switchCase.caseStmt() != null) // Caso específico
-            {
-                var caseStmt = switchCase.caseStmt();
-                ValueWrapper caseValue = Visit(caseStmt.expr());
-                
-                // Si el caso coincide, ejecutar todos sus statements
-                if (switchValue.Equals(caseValue))
-                {
-                    caseMatched = true;
-                    foreach (var stmt in caseStmt.stmt())
-                    {
-                        Visit(stmt);
-                    }
-                    break;
-                }
-            }
-            else if (switchCase.defaultStmt() != null && !caseMatched) // Caso por defecto
-            {
-                var defaultStmt = switchCase.defaultStmt();
-                foreach (var stmt in defaultStmt.stmt())
-                {
-                    Visit(stmt);
-                }
-            }
-        }
+            ValueWrapper switchValue = Visit(context.expr());
+            bool caseMatched = false;
 
-        return defaultValue;
-    }
+            foreach (var switchCase in context.switchCase())
+            {
+                if (switchCase.caseStmt() != null)
+                {
+                    var caseStmt = switchCase.caseStmt();
+                    ValueWrapper caseValue = Visit(caseStmt.expr());
+                    
+                    if (switchValue.Equals(caseValue))
+                    {
+                        caseMatched = true;
+                        try
+                        {
+                            foreach (var stmt in caseStmt.stmt())
+                            {
+                                Visit(stmt);
+                            }
+                        }
+                        catch (BreakException)
+                        {
+                            return defaultValue; // Salir del switch cuando encontramos un break
+                        }
+                        break;
+                    }
+                }
+                else if (switchCase.defaultStmt() != null && !caseMatched)
+                {
+                    var defaultStmt = switchCase.defaultStmt();
+                    try
+                    {
+                        foreach (var stmt in defaultStmt.stmt())
+                        {
+                            Visit(stmt);
+                        }
+                    }
+                    catch (BreakException)
+                    {
+                        return defaultValue; // Salir del switch cuando encontramos un break
+                    }
+                }
+            }
+
+            return defaultValue;
+        }
 
     private bool EvaluateCase(ValueWrapper caseValue)
     {
