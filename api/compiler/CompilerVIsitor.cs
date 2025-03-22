@@ -439,6 +439,7 @@ public override ValueWrapper VisitRune(LanguageParser.RuneContext context)
                         Console.WriteLine($"DEBUG: VisitAssign - Successfully assigned value to field '{fieldName}' in struct {currentStruct.Struct.Name}");
                         return defaultValue;
                     }
+                    
                     else
                     {
                         throw new SemanticError("Invalid property access: Target is not an instance or struct", context.Start);
@@ -497,6 +498,38 @@ public override ValueWrapper VisitRune(LanguageParser.RuneContext context)
             rowSlice.Elements[colInt.Value] = value;
             return defaultValue;
         }
+        // Asignación a slice
+                    else if (asignee is LanguageParser.SliceAccessContext sliceAccess)
+                    {
+                        var slice = Visit(sliceAccess.expr(0));
+                        var index = Visit(sliceAccess.expr(1));
+
+                        if (slice is not SliceValue sliceValue)
+                        {
+                            throw new SemanticError("Cannot index non-slice value", context.Start);
+                        }
+
+                        if (index is not IntValue indexValue)
+                        {
+                            throw new SemanticError("Slice index must be integer", context.Start);
+                        }
+
+                        // Verificar que el índice esté dentro de los límites
+                        if (indexValue.Value < 0 || indexValue.Value >= sliceValue.Elements.Count)
+                        {
+                            throw new SemanticError("Index out of bounds", context.Start);
+                        }
+
+                        // Verificar que el tipo del valor a asignar sea compatible con el tipo del slice
+                        if (!IsTypeCompatible(sliceValue.Type, value))
+                        {
+                            throw new SemanticError($"Cannot assign value of type {value.GetType().Name} to slice of type {sliceValue.Type}", context.Start);
+                        }
+
+                        // Actualizar el elemento en el slice
+                        sliceValue.Elements[indexValue.Value] = value;
+                        return value;
+                    }
     else
     {
         throw new SemanticError("Invalid assignment target", context.Start);
