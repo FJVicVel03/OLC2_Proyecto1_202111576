@@ -49,4 +49,24 @@ public class Environment
         }
         throw new SemanticError($"Variable '{id}' not found", token);
     }
+
+    public void Update(string id, ValueWrapper value, Antlr4.Runtime.IToken token)
+    {
+        if (variables.ContainsKey(id))
+        {
+            var (_, type) = variables[id];
+            if (value.GetType() != type && !(type == typeof(FloatValue) && value is IntValue))
+            {
+                throw new SemanticError($"Type mismatch: Cannot assign value of type '{value.GetType().Name}' to variable '{id}' of type '{type.Name}'", token);
+            }
+            variables[id] = (value, type);
+            return;
+        }
+        if (parent != null)
+        {
+            parent.Update(id, value, token);
+            return;
+        }
+        throw new SemanticError($"Variable '{id}' not found", token);
+    }
 }

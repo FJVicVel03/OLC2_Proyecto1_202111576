@@ -1468,6 +1468,56 @@ public override ValueWrapper VisitRune(LanguageParser.RuneContext context)
         return value;
     }
 
-    
+    public override ValueWrapper VisitForRangeStmt(LanguageParser.ForRangeStmtContext context)
+    {
+        Environment previousEnvironment = currentEnvironment;
+        currentEnvironment = new Environment(currentEnvironment);
+
+        try 
+        {
+            var collection = Visit(context.expr());
+
+            if (collection is not SliceValue sliceValue)
+            {
+                throw new SemanticError("Can only iterate over slice types", context.Start);
+            }
+
+            var indexVar = context.ID(0).GetText();
+            var valueVar = context.ID(1).GetText();
+
+            // Declarar las variables una sola vez antes del bucle
+            currentEnvironment.Declare(indexVar, new IntValue(0), context.Start);
+            currentEnvironment.Declare(valueVar, sliceValue.Elements[0], context.Start);
+
+            for (int i = 0; i < sliceValue.Elements.Count; i++)
+            {
+                // Actualizar valores en lugar de redeclarar
+                currentEnvironment.Update(indexVar, new IntValue(i), context.Start);
+                currentEnvironment.Update(valueVar, sliceValue.Elements[i], context.Start);
+
+                try
+                {
+                    foreach (var stmt in context.stmt())
+                    {
+                        Visit(stmt);
+                    }
+                }
+                catch (BreakException)
+                {
+                    break;
+                }
+                catch (ContinueException)
+                {
+                    continue;
+                }
+            }
+        }
+        finally
+        {
+            currentEnvironment = previousEnvironment;
+        }
+
+        return defaultValue;
+    }
 
 }
